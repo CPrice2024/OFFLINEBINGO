@@ -9,11 +9,15 @@ import transferRoutes from "./routes/transferRoutes.js";
 import creditRoutes from "./routes/creditRoutes.js";
 import commission from "./routes/commissionRoutes.js";
 import cors from "cors";
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 dotenv.config();
 connectDB();
 
 const app = express();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 app.use(express.json());
 app.use(cookieParser());
@@ -31,6 +35,13 @@ app.use("/api/payments", paymentRoutes);
 app.use("/api/transfer", transferRoutes);
 app.use("/api", creditRoutes);
 app.use("/api/commission", commission);
+// Serve React static files
+app.use(express.static(path.join(__dirname, 'build')));
+
+// Fallback for all other routes (SPA support)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
 
 
 const PORT = process.env.PORT || 5000;
