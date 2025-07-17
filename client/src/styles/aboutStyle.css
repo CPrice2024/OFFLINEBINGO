@@ -1,0 +1,146 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+  color: #ffffff;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+      background-image: conic-gradient(from 120deg, #000203, #006aad, #0089a3, #22200f24, #4caf5000, #22200f24);
+  background-size: cover;
+  background-attachment: fixed;
+  background-blend-mode: screen;
+}
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background-color: #121212;
+    color: white;
+  }
+  
+  header {
+    height: 2.5rem;
+  }
+ .img {
+    height: 2.5rem;
+  }
+  
+  
+  nav {
+    display: flex;
+    gap: 2rem;
+  }
+  
+  nav a {
+    color: #cccccc;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
+  }
+  
+  nav a:hover {
+    color: #ffffff;
+    text-decoration: underline;
+  }
+  .about-main {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .about-hero {
+    text-align: center;
+    padding: 4rem 2rem 2rem;
+    background: linear-gradient(180deg, #1a1a1a 0%, #121212 100%);
+  }
+  
+  .about-hero h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    font-weight: 700;
+  }
+  
+  .about-hero p {
+    font-size: 1.25rem;
+    color: #bbbbbb;
+  }
+  
+  .about-content {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding: 3rem 2rem;
+    background-color: #1a1a1a;
+  }
+  
+  @media (min-width: 768px) {
+    .about-content {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .about-content {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  
+  .about-text {
+    background-color: #121212;
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 10px rgba(255, 255, 255, 0.05);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+  }
+  
+  .about-text:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 20px rgba(255, 255, 255, 0.1);
+  }
+  
+  .about-text h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .about-text p, .about-text ul {
+    font-size: 1rem;
+    color: #bbbbbb;
+  }
+  
+  .about-text ul {
+    list-style: disc;
+    padding-left: 1.5rem;
+  }
+  
+  .about-text li {
+    margin-bottom: 0.5rem;
+  }
+  footer {
+    background-color: #121212;
+    text-align: center;
+    padding: 1.5rem 2rem;
+    color: #aaaaaa;
+    margin-top: auto;
+  }
+  footer img {
+    height: 2.5rem;
+    margin-bottom: 1rem;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    margin-left: 555px;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    margin-right: 555px;
+    border-radius: 50%;
+    overlay: rgba(255, 255, 255, 0.1);
+
+  }
+  
+  footer p {
+    font-size: 0.875rem;
+  }
+  

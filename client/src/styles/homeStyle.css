@@ -1,0 +1,133 @@
+.body, html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: #0d0d0d;
+    color: #ffffff;
+    min-height: 100vh;
+  }
+  .page-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    background-color: #121212;
+  }
+  .header img {
+    height: 50px;
+  }
+  .nav {
+    display: flex;
+    gap: 1.5rem;
+  }
+  .nav a {
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 1rem;
+    transition: color 0.3s;
+  }
+  .nav a:hover {
+    color: #4fc3f7;
+  }
+  .main {
+    flex: 1;
+    padding: 2rem;
+  }
+  .main-intro {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+  .main-intro h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+  .main-intro p {
+    font-size: 1.2rem;
+    color: #bbbbbb;
+  }
+  .card-gridd {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Two columns */
+  gap: 2rem;
+}
+  
+  @media (min-width: 768px) {
+    .card-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  .card-link {
+    text-decoration: none;
+  }
+  .cardd {
+    position: relative;
+    height: 249px;
+    margin-left: 35px;
+    width: 550px;
+    border-radius: 1rem;
+    overflow: hidden;
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+  .card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 20px rgb(32, 32, 34);
+  }
+  .card-overlay {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    padding: 1.5rem;
+    text-align: left;
+    color: #ffffff;
+    background: rgba(0, 110, 161, 0.747);
+    border-radius: 0 0 1rem 1rem;
+    background: linear-gradient(to top, rgb(0 113 160),transparent);
+  }
+  .card-overlay h3{
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: #ffffff;
+  }
+  .card-overlay p {
+    font-size: 1rem;
+    color: #dddddd;
+  }
+  .bingo-description {
+    text-align: center;
+    margin-top: 4rem;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .bingo-description h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+  .bingo-description p {
+    font-size: 1.1rem;
+    color: #bbbbbb;
+  }
+  .footer {
+    padding: 2rem;
+    background-color: #121212;
+    text-align: center;
+  }
+  
+  .footer img {
+    height: 40px;
+    margin-bottom: 1rem;
+  }
+  
+  .footer p {
+    color: #888888;
+    font-size: 0.9rem;
+  }
+  

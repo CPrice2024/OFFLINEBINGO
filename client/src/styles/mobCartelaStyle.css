@@ -1,0 +1,70 @@
+.bingo-page {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1px;
+  padding: 20px;
+}
+
+.card-box {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+}
+
+.card-search {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.card-search input {
+  flex: 1;
+  color: #787373;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.card-search button {
+  padding: 8px 12px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.bingo-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+}
+
+.bingo-cell {
+    text-align: center;
+    padding: 8px;
+    background-color: #b30000;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.bingo-cell:hover {
+  background-color: #bf0000;
+}
+
+.bingo-cell.selected {
+    background-color: #1530c6;
+    padding: 8px;
+    height: 36px;
+    width: auto;
+    color: white;
+}
+
+.blank-space {
+  text-align: center;
+  padding: 30px;
+  color: #aaa;
+  font-style: italic;
+}
