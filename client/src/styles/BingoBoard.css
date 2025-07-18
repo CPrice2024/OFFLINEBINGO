@@ -563,6 +563,7 @@ element.style {
     border-radius: 14px;
     border-style: solid;
     cursor: pointer;
+    background-color: #bc0101;
     font-size: 13px;
     margin-bottom: 10px;
     margin-left: 22px;
@@ -987,7 +988,7 @@ element.style {
     font-size: 16px;
     border: 1px solid #ffffff;
     border-radius: 8px;
-    background-color: #670000;
+    background-color: #c80000;
     color: #ffffff;
     margin-left: 4px;
     outline: none;

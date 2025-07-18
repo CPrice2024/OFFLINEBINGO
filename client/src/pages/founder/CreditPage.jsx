@@ -149,8 +149,8 @@ const fetchBalanceFromBackend = async () => {
           <FaUser className="profile-icon" />
           {sidebarOpen && (
             <div>
-              <p className="profile-name">{userName}</p>
-              <p className="profile-role">({userRole})</p>
+            <p className="profile-name">{userName}</p>
+              <p className="profile-role">Company</p>
             </div>
           )}
         </div>
@@ -288,15 +288,14 @@ const handleTransfer = async () => {
           <h3>Transactions History</h3>
           <div className="filters">
             <div className="input-icon-wrapper">
-              <BiSearch className="input-icon" />
               <input
-              type="text"
-              placeholder="Filter by email"
-        value={emailFilter}
-        onChange={(e) => setEmailFilter(e.target.value)}/>
+                type="text"
+                placeholder="Filter by email"
+                value={emailFilter}
+                onChange={(e) => setEmailFilter(e.target.value)}
+              />
         </div>
         <div className="input-icon-wrapper">
-          <AiOutlineCalendar className="input-icon" />
           <input
         type="date"
         value={startDate}
@@ -304,7 +303,6 @@ const handleTransfer = async () => {
         />
         </div>
         <div className="input-icon-wrapper">
-      <AiOutlineCalendar className="input-icon" />
       <input
         type="date"
         value={endDate}
