@@ -8,7 +8,7 @@ import { generateToken } from "../utils/generateToken.js";
 const cookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",
-  sameSite: "strict",
+  sameSite: "none",
   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
 };
 
@@ -293,7 +293,7 @@ export const getFounderTransactions = async (req, res) => {
     const { page = 1, limit = 20, email, startDate, endDate } = req.query;
 
     const query = {
-      senderId: req.user_Id, // 🔒 Only transactions made by this founder
+      senderId: req.user._id, // 🔒 Only transactions made by this founder
     };
 
     if (email) {
@@ -369,7 +369,7 @@ export const logout = (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    sameSite: "none",
   });
 
   res.status(200).json({ message: "Logged out successfully." });
