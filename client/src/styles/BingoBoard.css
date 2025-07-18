@@ -443,15 +443,13 @@ element.style {
 }
 
 .winner-amount-input {
-    margin-bottom: 20px;
-    padding: 16px 24px;
-    font-size: 15px;
-    color: #800000;
     background-color: #f9f9f9;
-    border-style: solid;
-    border-width: 0.5px;
-    border-color: #4a4b4cbb;
+    border: .5px solid #4a4b4cbb;
     border-radius: 10px;
+    color: maroon;
+    font-size: 14px;
+    margin-bottom: 15px;
+    padding: 12px 13px;
 }
 .winner-winner {
   margin-bottom: 0px;
@@ -560,18 +558,15 @@ element.style {
   color: #ffffff;
   unicode-bidi: isolate;}
 
-.new_card_button{
-  padding: 10px 30px;
-  cursor: pointer;
-  border-style: solid;
-  border-radius: 5px;
-  background-color: #5c0000;
-  color: white;
-  border: #e4dada;
-  border-style: solid;
-  font-size: 16px;
-  margin-left: 22px;
-  margin-bottom: 10px;
+.new_card_button {
+    border: #e4dada;
+    border-radius: 14px;
+    border-style: solid;
+    cursor: pointer;
+    font-size: 13px;
+    margin-bottom: 10px;
+    margin-left: 22px;
+    padding: 10px 30px;
 }
 .new_card_button:hover{
   background-color: #a10000;
@@ -867,7 +862,7 @@ element.style {
 
 
 .action-buttons {
-    display: -webkit-box;
+    display: ruby;
     flex-wrap: wrap;
     gap: 20px;
 }
