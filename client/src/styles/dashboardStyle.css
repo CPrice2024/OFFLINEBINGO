@@ -172,6 +172,8 @@
 .dashboard-filters button {
     padding: 8px 12px;
     border-style: none;
+    width: auto;
+    height: 38px;
     border-radius: 6px;
     background-color: #950000;
     color: var(--text-color);
