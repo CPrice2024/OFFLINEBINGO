@@ -169,7 +169,7 @@ const Users = () => {
         {sidebarOpen && (
           <div>
             <p className="profile-name">{userName}</p>
-            <p className="profile-role">({userRole})</p>
+            <p className="profile-role">Company</p>
           </div>
         )}
       </div>

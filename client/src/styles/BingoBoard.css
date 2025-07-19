@@ -444,12 +444,12 @@ element.style {
 
 .winner-amount-input {
     background-color: #f9f9f9;
-    border: .5px solid #4a4b4cbb;
-    border-radius: 10px;
+    border: .5px solid #fa0000bb;
+    border-radius: 5px;
     color: maroon;
-    font-size: 14px;
+    font-size: 13px;
     margin-bottom: 15px;
-    padding: 12px 13px;
+    padding: 10px 6px;
 }
 .winner-winner {
   margin-bottom: 0px;
@@ -560,14 +560,14 @@ element.style {
 
 .new_card_button {
     border: #e4dada;
-    border-radius: 14px;
+    border-radius: 6px;
     border-style: solid;
     cursor: pointer;
     background-color: #bc0101;
     font-size: 13px;
-    margin-bottom: 10px;
-    margin-left: 22px;
-    padding: 10px 30px;
+    margin-bottom: 9px;
+    margin-left: 19px;
+    padding: 7px 9px;
 }
 .new_card_button:hover{
   background-color: #a10000;
@@ -697,7 +697,7 @@ element.style {
     }
 
     .bingo-card-page {
-      padding: 20px;
+      padding: 15px;
     }
     
     .bingo-cards {
@@ -864,6 +864,7 @@ element.style {
 
 .action-buttons {
     display: ruby;
+    margin-left: -520px;
     flex-wrap: wrap;
     gap: 20px;
 }
@@ -984,7 +985,7 @@ element.style {
 }
 
 .select-commission {
-    padding: 10px 14px;
+    padding: 8px 14px;
     font-size: 16px;
     border: 1px solid #ffffff;
     border-radius: 8px;
@@ -1011,7 +1012,6 @@ element.style {
     display: flex;
     align-items: baseline;
     gap: 10px;
-    margin-bottom: -5px;
     margin-left: 250px;
 }
 

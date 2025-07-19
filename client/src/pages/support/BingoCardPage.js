@@ -261,7 +261,6 @@ const handleFindCard = () => {
 
         {foundCard && (
           <div className="found-card">
-            <h3>cartela {foundCard.id}</h3>
             {renderCard(foundCard)}
           </div>
         )}
