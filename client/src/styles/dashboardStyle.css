@@ -160,13 +160,13 @@
 }
 
 .dashboard-filters input {
-    padding: 16px 14px;
+    background-color: #f4f4f4;
+    border: 1px solid #9b0000;
     border-radius: 8px;
-    margin-top: 4px;
-    height: 21px;
-    border: 0.1px solid var(--border-color);
-    background-color: #a30000;
-    color: var(--text-color);
+    color: #890000;
+    font-size: 14px;
+    height: 10px;
+    padding: 19px 3px;
 }
 
 .dashboard-filters button {
@@ -176,11 +176,19 @@
     height: 38px;
     border-radius: 6px;
     background-color: #950000;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    border-style: none;
     color: var(--text-color);
     cursor: pointer;
     transition: background 0.2s;
 }
 
+.dashboard-filters button:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
+}
 .dashboard-filters button:hover {
   background-color:#c70000;
 }

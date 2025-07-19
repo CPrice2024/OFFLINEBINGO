@@ -9,7 +9,8 @@
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  padding: 15px;
+  padding: 5px;
+
 }
 
 .card-search {
@@ -19,10 +20,12 @@
 }
 
 .card-search input {
-  flex: 1;
-  color: #787373;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+    border: 1px solid #9f0000;
+    font-size: 14px;
+    border-radius: 6px;
+    color: #727272;
+    flex: 1 1;
+    padding: 5px;
 }
 
 .card-search button {
@@ -42,7 +45,7 @@
 
 .bingo-cell {
     text-align: center;
-    padding: 8px;
+    padding: 6px;
     background-color: #b30000;
     border-radius: 6px;
     font-weight: bold;
@@ -57,7 +60,7 @@
 .bingo-cell.selected {
     background-color: #1530c6;
     padding: 8px;
-    height: 36px;
+    height: 33px;
     width: auto;
     color: white;
 }
