@@ -78,7 +78,6 @@ useEffect(() => {
     });
   };
     const handleLogout = async () => {
-    if (!window.confirm("Are you sure you want to logout?")) return;
     try {
       await axios.post("/auth/logout", {}, { withCredentials: true });
       navigate("/support/signin");

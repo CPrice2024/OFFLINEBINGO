@@ -156,15 +156,13 @@ const handleFindCard = () => {
     setSearchCardId('');
   };
     const handleLogout = async () => {
-      if (!window.confirm("Are you sure you want to logout?")) return;
-      try {
-        await axios.post("/auth/logout", {}, { withCredentials: true });
-        navigate("/support/signin");
-      } catch (err) {
-        console.error("Logout error:", err);
-      }
-    };
-  
+    try {
+      await axios.post("/auth/logout", {}, { withCredentials: true });
+      navigate("/support/signin");
+    } catch (err) {
+      console.error("Logout error:", err);
+    }
+  };
 
   const renderCard = (card) => {
     const isSelected = selectedCardIds.includes(card.id);

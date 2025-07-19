@@ -195,10 +195,12 @@ const computeReceiverCutData = (transactions) => {
     }
   };
 
-  const handleLogout = () => {
-    if (window.confirm("Are you sure you want to logout?")) {
-      setStatus("");
+    const handleLogout = async () => {
+    try {
+      await axios.post("/auth/logout", {}, { withCredentials: true });
       navigate("/founder/signin");
+    } catch (err) {
+      console.error("Logout error:", err);
     }
   };
 

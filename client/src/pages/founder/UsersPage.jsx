@@ -138,13 +138,14 @@ const Users = () => {
     setShowCreateSupport(true);
   };
 
-  const handleLogout = async () => {
-    if (window.confirm("Are you sure you want to logout?")) {
-      await axios.post("/auth/logout");
+    const handleLogout = async () => {
+    try {
+      await axios.post("/auth/logout", {}, { withCredentials: true });
       navigate("/founder/signin");
+    } catch (err) {
+      console.error("Logout error:", err);
     }
   };
-
   const Sidebar = () => (
     <div className={`sidebar ${sidebarOpen ? "open" : "collapsed"}`}>
       <div className="sidebar-top">
