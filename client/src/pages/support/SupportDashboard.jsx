@@ -77,6 +77,15 @@ useEffect(() => {
       }
     });
   };
+    const handleLogout = async () => {
+    if (!window.confirm("Are you sure you want to logout?")) return;
+    try {
+      await axios.post("/auth/logout", {}, { withCredentials: true });
+      navigate("/support/signin");
+    } catch (err) {
+      console.error("Logout error:", err);
+    }
+  };
 
   const handleCommissionDeducted = () => {
     if (topbarRef.current?.fetchBalance) {
@@ -97,6 +106,7 @@ useEffect(() => {
         userName={userName}
         userRole={userRole}
         userId={userId}
+        handleLogout={handleLogout}
       />
 
       <div className="main-content">
