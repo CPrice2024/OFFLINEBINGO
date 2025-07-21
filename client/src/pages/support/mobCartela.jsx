@@ -6,7 +6,7 @@ const BingoCard = ({ card }) => {
   const [selectedCells, setSelectedCells] = useState(new Set());
 
   const toggleCell = (rowIdx, colIdx) => {
-    const key = `${rowIdx}-${colIdx}`;
+    const key = `${colIdx}-${ rowIdx}`;
     const updated = new Set(selectedCells);
     if (updated.has(key)) updated.delete(key);
     else updated.add(key);
@@ -18,9 +18,9 @@ const BingoCard = ({ card }) => {
       {card.map((row, rowIdx) =>
         row.map((num, colIdx) => (
           <div
-            key={`${rowIdx}-${colIdx}`}
+            key={`${colIdx}-${rowIdx}`}
             className={`bingo-cell ${
-              selectedCells.has(`${rowIdx}-${colIdx}`) ? "selected" : ""
+              selectedCells.has(`${colIdx}-${rowIdx}`) ? "selected" : ""
             }`}
             onClick={() => toggleCell(rowIdx, colIdx)}
           >
