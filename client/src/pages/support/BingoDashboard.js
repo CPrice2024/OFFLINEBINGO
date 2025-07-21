@@ -711,8 +711,8 @@ if (selectedCardIds.includes(card.id) && result?.isWinner) {
       {/* Transposed Numbers */}
      {Array.from({ length: 5 }).map((_, rowIndex) => (
   <div key={rowIndex} className="card-row">
-    {selectedCard.card.map((col, colIndex) => {
-      const number = col[rowIndex];
+    {selectedCard.card.map((row, colIndex) => {
+      const number = row[colIndex];
 
       const isCenter = rowIndex === 2 && colIndex === 2;
       const isCalled = calledNumbers.includes(number);
