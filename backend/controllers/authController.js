@@ -115,6 +115,21 @@ export const signupSupport = async (req, res) => {
     res.status(500).json({ message: "Internal server error", error: error.message });
   }
 };
+export const getSupportById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const support = await Support.findById(id).select("-password");
+    if (!support) {
+      return res.status(404).json({ message: "Support not found" });
+    }
+
+    res.json(support);
+  } catch (error) {
+    console.error("Error fetching support by ID:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
 
 
 export const signinSupport = async (req, res) => {

@@ -9,7 +9,6 @@ import {
   updateSupport,
   getSupports,
   deleteSupport,
-  getSupportById,
   getSupportProfile,
   getFounderProfile,
   getFounderTransactions,
@@ -17,8 +16,8 @@ import {
   getSupportTransactions,
   getNotifications,
   transferCredit,
+  getSupportById,
   logout,
-  getSupportCardType,
   markNotificationAsRead,
   deductCommission,
 } from "../controllers/authController.js";
