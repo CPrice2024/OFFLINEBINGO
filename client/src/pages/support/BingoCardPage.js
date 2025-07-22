@@ -32,18 +32,17 @@ function BingoCardPage({
 
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, userRole, userId } = useContext(AuthContext);
+  const { userName, userRole, userId } = useContext(AuthContext);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const userName = user?.name;
   const { winningCardIds = [], calledNumbers = [] } = location.state || {};
 
   useEffect(() => {
-    if (!user?._id) return; // Wait until user is loaded
+    if (!userId) return; // Wait until user is loaded
 
     const loadCards = async () => {
       setIsLoading(true);
       try {
-        const { data } = await axios.get(`/api/support/${user._id}`);
+        const { data } = await axios.get(`/api/support/${userId}`);
         const bingoCardType = data?.bingoCardType || "default";
 
         const response = await fetch(`/bingoCards/bingoCards_${bingoCardType}.json`);
@@ -189,7 +188,7 @@ function BingoCardPage({
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}
           isCollapsed={!sidebarOpen}
-          userId={user?._id}
+          userId={userId}
         />
         <div className="bingo-card-page">
 
