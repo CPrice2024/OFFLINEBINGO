@@ -52,8 +52,9 @@ router.get("/support/transactions", protect("support"), getSupportTransactions);
 router.get("/support/notifications", protect("support"), getNotifications);
 router.patch("/support/notifications/:id", protect("support"), markNotificationAsRead);
 router.post("/support/deduct", protect("support"), deductCommission);
-router.get("/support/:id", protect("support"), getSupportById);
 router.get("/support/:id/card-type", protect("support"), getSupportCardType);
+router.get("/support/:id", protect("support"), getSupportById);
+
 
 
 // ---------- Common ----------
