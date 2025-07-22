@@ -21,7 +21,6 @@ import {
   getSupportCardType,
   markNotificationAsRead,
   deductCommission,
-  getSupportCardType
 } from "../controllers/authController.js";
 
 import { protect } from "../middleware/authMiddleware.js";
