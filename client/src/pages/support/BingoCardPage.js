@@ -28,28 +28,24 @@ function BingoCardPage({
   const [searchCardId, setSearchCardId] = useState('');
   const [foundCard, setFoundCard] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [startMessage, setStartMessage] = useState('');
 
   const navigate = useNavigate();
   const location = useLocation();
-  const [startMessage, setStartMessage] = useState('');
   const { user, userRole, userId } = useContext(AuthContext);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const userName = user?.name ;
+  const userName = user?.name;
   const { winningCardIds = [], calledNumbers = [] } = location.state || {};
 
-   useEffect(() => {
+  useEffect(() => {
+    if (!user?._id) return; // Wait until user is loaded
+
     const loadCards = async () => {
       setIsLoading(true);
       try {
-        if (!user?._id) {
-          throw new Error("User ID not found.");
-        }
-
-        // Fetch user data from backend (to get the correct bingoCardType)
         const { data } = await axios.get(`/api/support/${user._id}`);
         const bingoCardType = data?.bingoCardType || "default";
 
-        // Dynamically fetch the JSON file from the public folder
         const response = await fetch(`/bingoCards/bingoCards_${bingoCardType}.json`);
         if (!response.ok) {
           throw new Error("Bingo card file not found.");
@@ -66,15 +62,14 @@ function BingoCardPage({
     };
 
     loadCards();
-  }, []);
+  }, [user?._id, setBingoCards]);
 
   useEffect(() => {
     if (startMessage) {
       const timer = setTimeout(() => {
         setStartMessage('');
-      }, 3000); 
-  
-      return () => clearTimeout(timer); 
+      }, 3000);
+      return () => clearTimeout(timer);
     }
   }, [startMessage]);
 
@@ -128,35 +123,34 @@ function BingoCardPage({
     });
   };
 
+  const handleFindCard = () => {
+    const cardId = parseInt(searchCardId);
+    if (isNaN(cardId)) {
+      setStartMessage('choose proper cartela Id!');
+      return;
+    }
 
-const handleFindCard = () => {
-  const cardId = parseInt(searchCardId);
-  if (isNaN(cardId)) {
-    setStartMessage('choose proper cartela Id!');
-    return;
-  }
+    const found = bingoCards.find((card) => card.id === cardId);
+    if (!found) {
+      setFoundCard(null);
+      setStartMessage('ካርቴላ ቁጥር አልተገኘም!');
+      return;
+    }
 
-  const found = bingoCards.find((card) => card.id === cardId);
-  if (!found) {
-    setFoundCard(null);
-    setStartMessage('ካርቴላ ቁጥር አልተገኘም!');
-    return;
-  }
+    setFoundCard(found);
 
-  setFoundCard(found);
-
-  if (!selectedCardIds.includes(cardId)) {
-    setSelectedCardIds((prev) => [...prev, cardId]);
-  }
-};
-
+    if (!selectedCardIds.includes(cardId)) {
+      setSelectedCardIds((prev) => [...prev, cardId]);
+    }
+  };
 
   const handleNewSelection = () => {
     setSelectedCardIds([]);
     setFoundCard(null);
     setSearchCardId('');
   };
-    const handleLogout = async () => {
+
+  const handleLogout = async () => {
     try {
       await axios.post("/auth/logout", {}, { withCredentials: true });
       navigate("/support/signin");
@@ -190,122 +184,121 @@ const handleFindCard = () => {
         userId={userId}
         handleLogout={handleLogout}
       />
-    <div className="main-content">
-      <Topbar
-      sidebarOpen={sidebarOpen}
-      setSidebarOpen={setSidebarOpen}
-      isCollapsed={!sidebarOpen}
-      userId={user?.userId} />
-      <div className="bingo-card-page">
+      <div className="main-content">
+        <Topbar
+          sidebarOpen={sidebarOpen}
+          setSidebarOpen={setSidebarOpen}
+          isCollapsed={!sidebarOpen}
+          userId={user?._id}
+        />
+        <div className="bingo-card-page">
 
-        <div className="winner-winner">
-          {!isWinnerAmountSet ? (
-            <div className="input-group">
+          <div className="winner-winner">
+            {!isWinnerAmountSet ? (
+              <div className="input-group">
+                <input
+                  type="number"
+                  value={winnerAmountInput}
+                  onChange={(e) => setWinnerAmountInput(e.target.value)}
+                  placeholder="amount"
+                  min="10"
+                  className="winner-amount-input"
+                />
+                <select
+                  className="select-commission"
+                  value={commissionPercent}
+                  onChange={(e) => setCommissionPercent(Number(e.target.value))}
+                >
+                  <option value={5}>1</option>
+                  <option value={10}>2</option>
+                  <option value={15}>3</option>
+                  <option value={20}>4</option>
+                  <option value={25}>5</option>
+                  <option value={30}>6</option>
+                  <option value={35}>7</option>
+                  <option value={40}>8</option>
+                </select>
+                <button className='new_card_button' onClick={handleSetWinnerAmount}>
+                  <FaMoneyBillWave style={{ marginRight: '8px' }} /> Amount
+                </button>
+              </div>
+            ) : (
+              <div className="winner-amount-display">
+                <h2>winner amount {winnerAmount} Birr</h2>
+                <div className="winner-actions">
+                  <button onClick={handleClearWinnerAmount} className="new_card_button">
+                    <FaEraser style={{ marginRight: '8px' }} /> Clear Amount
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {startMessage && (
+            <div className="signin-error">
+              {startMessage}
+            </div>
+          )}
+
+          <div className="action-buttons">
+            <div className="find-card-input">
               <input
-                type="number"
-                value={winnerAmountInput}
-                onChange={(e) => setWinnerAmountInput(e.target.value)}
-                placeholder="amount"
-                min="10"
                 className="winner-amount-input"
+                type="number"
+                value={searchCardId}
+                onChange={(e) => setSearchCardId(e.target.value)}
+                placeholder="input card Id"
+                min="1"
+                max="300"
               />
-              <select
-                className="select-commission"
-                value={commissionPercent}
-                onChange={(e) => setCommissionPercent(Number(e.target.value))}
-              >
-                <option value={5}>1</option>
-                <option value={10}>2</option>
-                <option value={15}>3</option>
-                <option value={20}>4</option>
-                <option value={25}>5</option>
-                <option value={30}>6</option>
-                <option value={35}>7</option>
-                <option value={40}>8</option>
-              </select>
-              <button className='new_card_button' onClick={handleSetWinnerAmount}>
-                <FaMoneyBillWave style={{ marginRight: '8px' }} /> Amount
+              <button onClick={handleFindCard} className="new_card_button">
+                <FaSearch style={{ marginRight: '8px' }} /> Search
               </button>
             </div>
-          ) : (
-            <div className="winner-amount-display">
-              <h2>winner amount {winnerAmount} Birr</h2>
-              <div className="winner-actions">
-                <button onClick={handleClearWinnerAmount} className="new_card_button">
-                  <FaEraser style={{ marginRight: '8px' }} /> Clear Amount
-                </button>
+            <button onClick={handleNewSelection} className="new_card_button">
+              <FiRefreshCcw style={{ marginRight: '8px' }} /> Clear
+            </button>
+            <button onClick={handleNavigateToGame} className="new_card_button">
+              <FaGamepad style={{ marginRight: '8px' }} /> Save
+            </button>
+          </div>
+
+          {foundCard && (
+            <div className="found-card">
+              {renderCard(foundCard)}
+            </div>
+          )}
+
+          {selectedCardIds.length > 0 && (
+            <div className="selected-cards">
+              <h3>Selected cartela</h3>
+              <div className="selected-card-container">
+                {selectedCardIds.map((id) => (
+                  <span
+                    key={id}
+                    onClick={() => handleSelectCard(id)}
+                    className="card-id-circle-selected"
+                  >
+                    {id}
+                  </span>
+                ))}
               </div>
             </div>
           )}
+
+          {isLoading ? (
+            <div className="loading">loading cartela...</div>
+          ) : (
+            <div className="bingo-cards">
+              {Array.isArray(bingoCards) && bingoCards.length > 0 ? (
+                bingoCards.map(renderCard)
+              ) : (
+                <div className='signin-error'>can't find!</div>
+              )}
+            </div>
+          )}
         </div>
-{startMessage && (
-  <div className="signin-error">
-    {startMessage}
-  </div>
-)}
-        <div className="action-buttons">
-           <div className="find-card-input">
-          <input
-            className="winner-amount-input"
-            type="number"
-            value={searchCardId}
-            onChange={(e) => setSearchCardId(e.target.value)}
-            placeholder="input card Id"
-            min="1"
-            max="300"
-          />
-          <button onClick={handleFindCard} className="new_card_button">
-            <FaSearch style={{ marginRight: '8px' }} /> Search
-          </button>
-        </div>
-          <button onClick={handleNewSelection} className="new_card_button">
-            <FiRefreshCcw style={{ marginRight: '8px' }} /> Clear
-          </button>
-          <button onClick={handleNavigateToGame} className="new_card_button">
-            <FaGamepad style={{ marginRight: '8px' }} /> Save
-          </button>
-          
-        </div>
-
-       
-
-        {foundCard && (
-          <div className="found-card">
-            {renderCard(foundCard)}
-          </div>
-        )}
-
-        {selectedCardIds.length > 0 && (
-  <div className="selected-cards">
-    <h3>Selected cartela</h3>
-    <div className="selected-card-container">
-      {selectedCardIds.map((id) => (
-        <span
-          key={id}
-          onClick={() => handleSelectCard(id)}
-          className="card-id-circle-selected" 
-        >
-          {id}
-        </span>
-      ))}
-    </div>
-  </div>
-)}
-
-
-        {isLoading ? (
-          <div className="loading">loading cartela...</div>
-        ) : (
-          <div className="bingo-cards">
-            {Array.isArray(bingoCards) && bingoCards.length > 0 ? (
-              bingoCards.map(renderCard)
-            ) : (
-              <div className='signin-error'>can't find!</div>
-            )}
-          </div>
-        )}
       </div>
-    </div>
     </div>
   );
 }
