@@ -745,3 +745,15 @@ mark {
     transform: translateY(0);
   }
 }
+.bingo-select:focus {
+  border-color: #cbcbcb;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+}
+
+.bingo-select option {
+  background: #fff;
+  color: #333;
+}
+.bingo-select option:hover {
+  background: #f0f0f0;
+}
