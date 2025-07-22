@@ -61,7 +61,7 @@ function BingoCardPage({
     };
 
     loadCards();
-  }, [user?._id, setBingoCards]);
+  }, [userId, setBingoCards]);
 
   useEffect(() => {
     if (startMessage) {
