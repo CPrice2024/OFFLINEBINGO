@@ -45,7 +45,6 @@ router.post("/support/deduct", protect("support"), deductCommission);
 router.post("/support/signup", protect("founder"), signupSupport);
 
 router.post("/support/signin", signinSupport);
-router.get("/card-type/:id", getSupportCardType);
 router.get("/support", protect("founder"), getSupports); 
 router.delete("/support/:id", protect("founder"), deleteSupport);
 router.put("/support/:id", protect("founder"), updateSupport);
@@ -54,6 +53,7 @@ router.get("/support/transactions", protect("support"), getSupportTransactions);
 router.get("/support/notifications", protect("support"), getNotifications);
 router.patch("/support/notifications/:id", protect("support"), markNotificationAsRead);
 router.post("/support/deduct", protect("support"), deductCommission);
+router.get("/support/:id", protect("support"), getSupportById);
 router.get("/support/:id/card-type", protect("support"), getSupportCardType);
 
 
