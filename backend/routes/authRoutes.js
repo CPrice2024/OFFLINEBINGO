@@ -17,6 +17,7 @@ import {
   getNotifications,
   transferCredit,
   logout,
+  getSupportCardType,
   markNotificationAsRead,
   deductCommission
 } from "../controllers/authController.js";
@@ -42,6 +43,7 @@ router.post("/support/deduct", protect("support"), deductCommission);
 router.post("/support/signup", protect("founder"), signupSupport);
 
 router.post("/support/signin", signinSupport);
+router.get("/card-type/:id", getSupportCardType);
 router.get("/support", protect("founder"), getSupports); 
 router.delete("/support/:id", protect("founder"), deleteSupport);
 router.put("/support/:id", protect("founder"), updateSupport);

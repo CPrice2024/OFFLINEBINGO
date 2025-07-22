@@ -226,6 +226,21 @@ export const getFounderProfile = async (req, res) => {
   }
 };
 
+export const getSupportCardType = async (req, res) => {
+  try {
+    const support = await Support.findById(req.params.id).select("bingoCardType");
+    if (!support) {
+      return res.status(404).json({ message: "Support not found" });
+    }
+
+    res.json({ bingoCardType: support.bingoCardType || "default" });
+  } catch (error) {
+    console.error("Error fetching bingoCardType:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
 // ----------- Credit Transfer (Properly defined) -----------
 export const transferCredit = async (req, res) => {
   try {

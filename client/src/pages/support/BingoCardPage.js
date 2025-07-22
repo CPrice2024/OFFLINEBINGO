@@ -37,35 +37,36 @@ function BingoCardPage({
   const userName = user?.name ;
   const { winningCardIds = [], calledNumbers = [] } = location.state || {};
 
-  useEffect(() => {
+   useEffect(() => {
     const loadCards = async () => {
       setIsLoading(true);
       try {
-        const email = user?.email || '';
-        const sanitizedEmail = email.toLowerCase().replace(/[@.]/g, "_");
-
-        let cards;
-        try {
-          cards = await import(`../../data/bingoCards_${sanitizedEmail}.json`);
-          console.log("✅ Loaded custom cards for", email);
-        } catch {
-          cards = await import(`../../data/bingoCards_default.json`);
-          console.log("ℹ️ Loaded default cards");
+        if (!user?._id) {
+          throw new Error("User ID not found.");
         }
 
-        setBingoCards(cards.default);
+        // Fetch user data from backend (to get the correct bingoCardType)
+        const { data } = await axios.get(`/api/support/${user._id}`);
+        const bingoCardType = data?.bingoCardType || "default";
+
+        // Dynamically fetch the JSON file from the public folder
+        const response = await fetch(`/bingoCards/bingoCards_${bingoCardType}.json`);
+        if (!response.ok) {
+          throw new Error("Bingo card file not found.");
+        }
+
+        const cards = await response.json();
+        setBingoCards(cards);
       } catch (err) {
-        console.error("Error loading cards:", err);
+        console.error("Error loading cards:", err.message);
         setStartMessage("ካርቴላ መጫን አልተሳካም።");
       } finally {
         setIsLoading(false);
       }
     };
 
-    if (!bingoCards.length) {
-      loadCards();
-    }
-  }, [user?.email]);
+    loadCards();
+  }, []);
 
   useEffect(() => {
     if (startMessage) {
