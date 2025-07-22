@@ -17,6 +17,7 @@ import {
   getNotifications,
   transferCredit,
   getSupportById,
+  getSupportCardType,
   logout,
   markNotificationAsRead,
   deductCommission,
