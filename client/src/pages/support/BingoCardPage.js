@@ -28,23 +28,27 @@ function BingoCardPage({
   const [searchCardId, setSearchCardId] = useState('');
   const [foundCard, setFoundCard] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [startMessage, setStartMessage] = useState('');
 
   const navigate = useNavigate();
   const location = useLocation();
-  const { userName, userRole, userId } = useContext(AuthContext);
+  const [startMessage, setStartMessage] = useState('');
+  const { userId, userRole, userName } = useContext(AuthContext);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const { winningCardIds = [], calledNumbers = [] } = location.state || {};
 
   useEffect(() => {
-    if (!userId) return; // Wait until user is loaded
-
     const loadCards = async () => {
       setIsLoading(true);
       try {
-        const { data } = await axios.get(`/api/support/${userId}`);
+        if (!userId) {
+          throw new Error("User ID not found.");
+        }
+
+        // Fetch bingoCardType from backend
+        const { data } = await axios.get(`/api/support/${userId}/card-type`, { withCredentials: true });
         const bingoCardType = data?.bingoCardType || "default";
 
+        // Dynamically fetch the correct JSON file
         const response = await fetch(`/bingoCards/bingoCards_${bingoCardType}.json`);
         if (!response.ok) {
           throw new Error("Bingo card file not found.");
@@ -68,6 +72,7 @@ function BingoCardPage({
       const timer = setTimeout(() => {
         setStartMessage('');
       }, 3000);
+
       return () => clearTimeout(timer);
     }
   }, [startMessage]);
@@ -191,7 +196,7 @@ function BingoCardPage({
           userId={userId}
         />
         <div className="bingo-card-page">
-
+          {/* Winner amount input */}
           <div className="winner-winner">
             {!isWinnerAmountSet ? (
               <div className="input-group">
@@ -232,13 +237,12 @@ function BingoCardPage({
               </div>
             )}
           </div>
-
           {startMessage && (
             <div className="signin-error">
               {startMessage}
             </div>
           )}
-
+          {/* Actions */}
           <div className="action-buttons">
             <div className="find-card-input">
               <input
@@ -261,13 +265,11 @@ function BingoCardPage({
               <FaGamepad style={{ marginRight: '8px' }} /> Save
             </button>
           </div>
-
           {foundCard && (
             <div className="found-card">
               {renderCard(foundCard)}
             </div>
           )}
-
           {selectedCardIds.length > 0 && (
             <div className="selected-cards">
               <h3>Selected cartela</h3>
@@ -284,7 +286,6 @@ function BingoCardPage({
               </div>
             </div>
           )}
-
           {isLoading ? (
             <div className="loading">loading cartela...</div>
           ) : (
