@@ -27,7 +27,7 @@ function BingoCardPage({
   const [isWinnerAmountSet, setIsWinnerAmountSet] = useState(false);
   const [searchCardId, setSearchCardId] = useState('');
   const [foundCard, setFoundCard] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -37,34 +37,26 @@ function BingoCardPage({
   const { winningCardIds = [], calledNumbers = [] } = location.state || {};
 
   useEffect(() => {
-    const loadCards = async () => {
-      setIsLoading(true);
+    const fetchCard = async () => {
       try {
-        if (!userId) {
-          throw new Error("User ID not found.");
-        }
+        const typeRes = await axios.get(`/support/${userId}/card-type`);
+        const bingoCardType = typeRes.data.bingoCardType || "default";
 
-        // Fetch bingoCardType from backend
-        const { data } = await axios.get(`/api/support/${userId}/card-type`, { withCredentials: true });
-        const bingoCardType = data?.bingoCardType || "default";
+        const cardRes = await fetch(`/bingoCards/bingoCards_${bingoCardType}.json`);
+        const cardData = await cardRes.json();
 
-        // Dynamically fetch the correct JSON file
-        const response = await fetch(`/bingoCards/bingoCards_${bingoCardType}.json`);
-        if (!response.ok) {
-          throw new Error("Bingo card file not found.");
-        }
-
-        const cards = await response.json();
-        setBingoCards(cards);
-      } catch (err) {
-        console.error("Error loading cards:", err.message);
-        setStartMessage("ካርቴላ መጫን አልተሳካም።");
+        setBingoCards(cardData);
+      } catch (error) {
+        console.error("Failed to load bingo cards:", error);
+        setBingoCards([]);
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
 
-    loadCards();
+    if (userId) {
+      fetchCard();
+    }
   }, [userId, setBingoCards]);
 
   useEffect(() => {
@@ -72,7 +64,6 @@ function BingoCardPage({
       const timer = setTimeout(() => {
         setStartMessage('');
       }, 3000);
-
       return () => clearTimeout(timer);
     }
   }, [startMessage]);
@@ -213,14 +204,14 @@ function BingoCardPage({
                   value={commissionPercent}
                   onChange={(e) => setCommissionPercent(Number(e.target.value))}
                 >
-                  <option value={5}>1</option>
-                  <option value={10}>2</option>
-                  <option value={15}>3</option>
-                  <option value={20}>4</option>
-                  <option value={25}>5</option>
-                  <option value={30}>6</option>
-                  <option value={35}>7</option>
-                  <option value={40}>8</option>
+                  <option value={5}>5%</option>
+                  <option value={10}>10%</option>
+                  <option value={15}>15%</option>
+                  <option value={20}>20%</option>
+                  <option value={25}>25%</option>
+                  <option value={30}>30%</option>
+                  <option value={35}>35%</option>
+                  <option value={40}>40%</option>
                 </select>
                 <button className='new_card_button' onClick={handleSetWinnerAmount}>
                   <FaMoneyBillWave style={{ marginRight: '8px' }} /> Amount
@@ -286,14 +277,14 @@ function BingoCardPage({
               </div>
             </div>
           )}
-          {isLoading ? (
+          {loading ? (
             <div className="loading">loading cartela...</div>
           ) : (
             <div className="bingo-cards">
               {Array.isArray(bingoCards) && bingoCards.length > 0 ? (
                 bingoCards.map(renderCard)
               ) : (
-                <div className='signin-error'>can't find!</div>
+                <div className='signin-error'>No cartelas found.</div>
               )}
             </div>
           )}

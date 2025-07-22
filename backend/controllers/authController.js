@@ -244,15 +244,23 @@ export const getFounderProfile = async (req, res) => {
   }
 };
 
+// In authController.js
 export const getSupportCardType = async (req, res) => {
   try {
-    const support = await Support.findById(req.params.id).select("bingoCardType");
-    if (!support) return res.status(404).json({ message: "Support not found" });
-    res.json({ bingoCardType: support.bingoCardType || "default" });
+    const supportId = req.params.id;
+    const support = await Support.findById(supportId);
+
+    if (!support) {
+      return res.status(404).json({ message: "Support not found" });
+    }
+
+    res.status(200).json({ bingoCardType: support.bingoCardType });
   } catch (error) {
+    console.error("getSupportCardType error:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
+
 
 
 
