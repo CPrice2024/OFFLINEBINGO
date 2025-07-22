@@ -29,6 +29,8 @@ const Users = () => {
     phone: "",
     password: "",
     commission: "",
+    city: "",
+    bingoCardType: "default",
   });
 
   const [openMenuIndex, setOpenMenuIndex] = useState(null);
@@ -133,6 +135,8 @@ const Users = () => {
       phone: support.phone,
       password: "",
       commission: support.commission ?? "",
+      city: support.city ?? "",
+      bingoCardType: support.bingoCardType || "default",
     });
     setEditingSupport(support);
     setShowCreateSupport(true);
@@ -241,6 +245,8 @@ const Users = () => {
                   <th><MdPhone /> Phone</th>
                   <th><FaChartLine /> Balance(Birr)</th>
                   <th><FaChartLine /> Commission</th>
+                  <th><FaUsers /> City</th>
+                  <th><FaUsers /> Bingo Card Type</th>
                   <th><AiOutlineCalendar /> Created</th>
                   <th>Actions</th>
                 </tr>
@@ -262,6 +268,8 @@ const Users = () => {
                         ${support.balance?.toLocaleString() ?? "0"}
                       </td>
                       <td>{support.commission ? `${support.commission}%` : "-"}</td>
+                      <td>{support.city}</td>
+                      <td>{support.bingoCardType}</td>
                       <td>{support.createdAt.slice(0, 10)}</td>
                       <td style={{ position: "relative" }}>
                         <button
@@ -333,7 +341,7 @@ const Users = () => {
               onClick={() => {
                 setShowCreateSupport(false);
                 setEditingSupport(null);
-                setFormData({ name: "", email: "", phone: "", password: "", commission: "" });
+                setFormData({ name: "", email: "", phone: "", password: "", commission: "", city: "", bingoCardType: "default" });
               }}
             >
               <MdClose size={20} />
@@ -350,6 +358,19 @@ const Users = () => {
               <input type="password" name="password" placeholder="Password" value={formData.password} onChange={handleInputChange} required={!editingSupport} />
               <input type="text" name="phone" placeholder="Phone" value={formData.phone} onChange={handleInputChange} required />
               <input type="text" name="commission" placeholder="Commission" value={formData.commission} onChange={handleInputChange} required />
+              <input type="text" name="city" placeholder="City" value={formData.city} onChange={handleInputChange} required />
+              <select
+              name="bingoCardType"
+              value={formData.bingoCardType}
+              onChange={handleInputChange}
+               required
+               className="bingo-select"
+               >
+                <option value="default">Default</option>
+                <option value="classic">Classic</option>
+                <option value="patternA">Pattern A</option>
+                <option value="patternB">Pattern B</option>
+              </select>
               <button type="submit" className="modal-submit">
                 {editingSupport ? "Update" : "Create"}
               </button>

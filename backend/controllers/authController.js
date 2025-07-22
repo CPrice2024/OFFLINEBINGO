@@ -49,7 +49,7 @@ export const deleteFounder = async (req, res) => {
 export const updateSupport = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, email, phone, password, commission } = req.body;
+    const { name, email, phone, password, commission, city, bingoCardType  } = req.body;
 
     const support = await Support.findById(id);
     if (!support) return res.status(404).json({ message: "Support not found." });
@@ -64,6 +64,8 @@ export const updateSupport = async (req, res) => {
       email,
       phone,
       commission,
+      city,
+      bingoCardType: bingoCardType || support.bingoCardType,
     };
 
     if (password) {
@@ -84,7 +86,7 @@ export const updateSupport = async (req, res) => {
 // ----------- Support -----------
 export const signupSupport = async (req, res) => {
   try {
-    const { name, email, password, phone, city, commission } = req.body;
+    const { name, email, password, phone, city, commission, bingoCardType } = req.body;
 
     const existingSupport = await Support.findOne({ email });
     if (existingSupport) {
@@ -100,6 +102,7 @@ export const signupSupport = async (req, res) => {
       phone,
       city,
       commission: commission || "0",
+      bingoCardType: bingoCardType || "default",
       createdBy: req.user._id,
     });
 

@@ -184,7 +184,22 @@
     cursor: pointer;
     transition: background 0.2s;
 }
-
+.bingo-select {
+    padding: 10px 14px;
+    margin-top: 4px;
+    font-size: 16px;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    color: #333;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    width: 100%;
+    max-width: 300px;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
 .dashboard-filters button:focus {
   outline: none;
   box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
@@ -490,7 +505,7 @@ mark {
 .create-support-modal button {
     padding: 6px 13px;
     width: 87px;
-    margin-top: 4px;
+    margin-top: 15px;
     margin-left: 83px;
 }
 /* Create Support Modal Styles */

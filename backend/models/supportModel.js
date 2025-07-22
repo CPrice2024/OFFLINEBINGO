@@ -8,6 +8,11 @@ const supportSchema = new mongoose.Schema({
   city: { type: String, required: false },
   balance: { type: Number, default: 0 },
   commission: { type: Number, default: 0 },
+  bingoCardType: {
+    type: String,
+    enum: ["default", "classic", "patternA", "patternB"], 
+    default: "default",
+  },
   currentToken: { type: String, default: null },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
