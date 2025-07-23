@@ -40,19 +40,19 @@ function BingoCardPage({
   useEffect(() => {
     const loadBingoCard = async () => {
       try {
-        // 1. Get support profile to know card type
         const res = await axios.get("/auth/support/profile", { withCredentials: true });
         const bingoCardType = res.data.bingoCardType || "default";
 
-        // 2. Try to load from public folder
-        let cardRes = await fetch(`/bingocards/bingocards.${bingoCardType}.json`);
+        // Try loading the file
+        let cardRes = await fetch(`/bingoCards/bingoCards.${bingoCardType}.json`);
         if (!cardRes.ok) {
           console.warn(`Card file for type "${bingoCardType}" not found. Falling back to default.`);
-          cardRes = await fetch(`/bingocards/bingocards.default.json`);
+          cardRes = await fetch(`/bingoCards/bingoCards.default.json`);
         }
 
-        const json = await cardRes.json();
-        setBingoCards(json.cards || json); // Update parent state
+        const text = await cardRes.text();
+        const json = JSON.parse(text); // Safe parse (will throw if invalid)
+        setBingoCards(json.cards || json);
       } catch (err) {
         console.error("Failed to load cards:", err);
         setBingoCards([]);
@@ -211,14 +211,9 @@ function BingoCardPage({
                   value={commissionPercent}
                   onChange={(e) => setCommissionPercent(Number(e.target.value))}
                 >
-                  <option value={5}>5%</option>
-                  <option value={10}>10%</option>
-                  <option value={15}>15%</option>
-                  <option value={20}>20%</option>
-                  <option value={25}>25%</option>
-                  <option value={30}>30%</option>
-                  <option value={35}>35%</option>
-                  <option value={40}>40%</option>
+                  {[5, 10, 15, 20, 25, 30, 35, 40].map(p => (
+                    <option key={p} value={p}>{p}%</option>
+                  ))}
                 </select>
                 <button className='new_card_button' onClick={handleSetWinnerAmount}>
                   <FaMoneyBillWave style={{ marginRight: '8px' }} /> Amount
