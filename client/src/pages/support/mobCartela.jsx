@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import "../../styles/mobCartelaStyle.css";
-import cardsDefault from "../../data/bingoCards_default.json";
-import cardsClassic from "../../data/bingoCards_classic.json";
-import cardsPatternA from "../../data/bingoCards_patternA.json";
-import cardsPatternB from "../../data/bingoCards_patternB.json";
+import cardsA100 from "../../../public/bingoCards/bingoCards.A100.json";
+import cardsA200 from "../../../public/bingoCards/bingoCards.A200.json";
+import cardsW60 from "../../../public/bingoCards/bingoCards.W60.json";
+import cardsR250 from "../../../public/bingoCards/bingoCards.R250.json";
 
 const BingoCard = ({ card }) => {
   const [selectedCells, setSelectedCells] = useState(new Set());
@@ -37,19 +37,19 @@ const BingoCard = ({ card }) => {
 
 const CardBox = () => {
   const [inputId, setInputId] = useState("");
-  const [cardType, setCardType] = useState("default");
+  const [cardType, setCardType] = useState("A100");
   const [foundCard, setFoundCard] = useState(null);
 
   const getCardsData = () => {
     switch (cardType) {
-      case "classic":
-        return cardsClassic;
-      case "patternA":
-        return cardsPatternA;
-      case "patternB":
-        return cardsPatternB;
+      case "A200":
+        return cardsA200;
+      case "W60":
+        return cardsW60;
+      case "R250":
+        return cardsR250;
       default:
-        return cardsDefault;
+        return cardsA100
     }
   };
 
@@ -63,10 +63,10 @@ const CardBox = () => {
     <div className="card-box">
       <div className="card-options">
         <select value={cardType} onChange={(e) => setCardType(e.target.value)}>
-          <option value="default">Default</option>
-          <option value="classic">Classic</option>
-          <option value="patternA">Pattern A</option>
-          <option value="patternB">Pattern B</option>
+          <option value="A100">A100</option>
+          <option value="A200">A200</option>
+          <option value="W60">W60</option>
+          <option value="R250">R250</option>
         </select>
       </div>
       <div className="card-search">
