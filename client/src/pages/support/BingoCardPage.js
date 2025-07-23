@@ -45,10 +45,10 @@ function BingoCardPage({
         const bingoCardType = res.data.bingoCardType || "default";
 
         // 2. Try to load from public folder
-        let cardRes = await fetch(`/bingocards/bingocards.${bingoCardType}.json`);
+        let cardRes = await fetch(`/bingoCards/bingocards.${bingoCardType}.json`);
         if (!cardRes.ok) {
           console.warn(`Card file for type "${bingoCardType}" not found. Falling back to default.`);
-          cardRes = await fetch(`/bingocards/bingocards.default.json`);
+          cardRes = await fetch(`/bingoCards/bingocards.default.json`);
         }
 
         const json = await cardRes.json();
