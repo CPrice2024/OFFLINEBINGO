@@ -58,7 +58,22 @@
   color: #333;
 }
 
-
+.card-search {
+    display: flex;
+    margin-bottom: 10px;
+    gap: 10px;
+}
+.card-search input {
+    color: rgb(114, 114, 114);
+    font-size: 14px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: rgb(159, 0, 0);
+    border-image: initial;
+    border-radius: 6px;
+    flex: 1 1 0%;
+    padding: 5px;
+}
 .card-search button {
   padding: 8px 12px;
   background: #eb0000;

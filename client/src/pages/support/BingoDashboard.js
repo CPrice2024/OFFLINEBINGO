@@ -44,6 +44,7 @@ const BingoDashboard = ({
   bingoCards = [],
   winnerAmount = 0,
   selectedCardIds = [],
+  setSelectedCardIds, // <-- Add this line
   userId = "",
   commissionPercent = 0,
   eachCardAmount = 0,
@@ -308,7 +309,7 @@ const startGame = async () => {
 
 
 const restartGame = () => {
-  // Reset local states
+  // Reset local state
   initializeGame();
   hasSavedSummary.current = false;
 
@@ -318,8 +319,9 @@ const restartGame = () => {
   setInputCardId('');
   setIsPaused(false);
 
-  // Clear parent calledNumbers
+  // Clear parent states
   if (typeof setCalledNumbers === 'function') setCalledNumbers([]);
+  if (typeof setSelectedCardIds === 'function') setSelectedCardIds([]);
 
   // Restart game
   setIsGameRunning(true);
@@ -351,6 +353,10 @@ const goToBingoCardPage = () => {
       userId,
     },
   });
+
+  setTimeout(() => {
+    window.location.reload();
+  }, 1); 
 };
 
 const verifyCard = (card) => {
@@ -751,19 +757,20 @@ if (selectedCardIds.includes(card.id) && result?.isWinner) {
     </div>
   );
 };
-
 BingoDashboard.propTypes = {
   calledNumbers: PropTypes.array.isRequired,
   setCalledNumbers: PropTypes.func.isRequired,
   bingoCards: PropTypes.array.isRequired,
   winnerAmount: PropTypes.number.isRequired,
   selectedCardIds: PropTypes.array.isRequired,
+  setSelectedCardIds: PropTypes.func.isRequired, // <-- Add this line
   userId: PropTypes.string.isRequired,
   commissionPercent: PropTypes.number.isRequired,
   eachCardAmount: PropTypes.number.isRequired,
   cardCount: PropTypes.number.isRequired,
   onCommissionDeducted: PropTypes.func,
 };
+
 
 
 export default BingoDashboard;
