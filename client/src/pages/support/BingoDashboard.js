@@ -307,12 +307,24 @@ const startGame = async () => {
 };
 
 
-  const restartGame = () => {
-    initializeGame();
-    hasSavedSummary.current = false;
-    
-    setIsGameRunning(true);
-  };
+const restartGame = () => {
+  // Reset local states
+  initializeGame();
+  hasSavedSummary.current = false;
+
+  setWinningCards([]);
+  setCurrentNumber(null);
+  setResult('');
+  setInputCardId('');
+  setIsPaused(false);
+
+  // Clear parent calledNumbers
+  if (typeof setCalledNumbers === 'function') setCalledNumbers([]);
+
+  // Restart game
+  setIsGameRunning(true);
+};
+
 
   const cleanGame = () => {
   setIsGameRunning(false);
@@ -339,10 +351,6 @@ const goToBingoCardPage = () => {
       userId,
     },
   });
-
-  setTimeout(() => {
-    window.location.reload();
-  }, 1); 
 };
 
 const verifyCard = (card) => {
