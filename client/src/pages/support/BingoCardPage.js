@@ -44,6 +44,7 @@ function BingoCardPage({
         const bingoCardType = res.data.bingoCardType || "default";
 
         // Try loading the file
+        console.log("Fetching bingo cards for type:", bingoCardType);
         let cardRes = await fetch(`/bingoCards/bingoCards.${bingoCardType}.json`);
         if (!cardRes.ok) {
           console.warn(`Card file for type "${bingoCardType}" not found. Falling back to default.`);
