@@ -291,7 +291,7 @@ function BingoCardPage({
               {Array.isArray(bingoCards) && bingoCards.length > 0 ? (
                 bingoCards.map(renderCard)
               ) : (
-                <div className='signin-error'>No cartelas found.</div>
+                <div className='signin-error'>No cartela found.</div>
               )}
             </div>
           )}
