@@ -18,7 +18,9 @@ const BingoCard = ({ card }) => {
         row.map((num, colIdx) => (
           <div
             key={`${colIdx}-${rowIdx}`}
-            className={`bingo-cell ${selectedCells.has(`${colIdx}-${rowIdx}`) ? "selected" : ""}`}
+            className={`bingo-cell ${
+              selectedCells.has(`${colIdx}-${rowIdx}`) ? "selected" : ""
+            }`}
             onClick={() => toggleCell(rowIdx, colIdx)}
           >
             {num === 0 ? "0" : num}
@@ -29,9 +31,8 @@ const BingoCard = ({ card }) => {
   );
 };
 
-const CardBox = () => {
+const CardBox = ({ cardType }) => {
   const [inputId, setInputId] = useState("");
-  const [cardType, setCardType] = useState("A100");
   const [foundCard, setFoundCard] = useState(null);
 
   const getCardsData = async () => {
@@ -50,16 +51,13 @@ const CardBox = () => {
     }
   };
 
+  const handleClear = () => {
+    setInputId("");
+    setFoundCard(null);
+  };
+
   return (
     <div className="card-box">
-      <div className="card-options">
-        <select value={cardType} onChange={(e) => setCardType(e.target.value)}>
-          <option value="A100">A100</option>
-          <option value="A200">A200</option>
-          <option value="W60">W60</option>
-          <option value="R250">R250</option>
-        </select>
-      </div>
       <div className="card-search">
         <input
           type="number"
@@ -68,6 +66,9 @@ const CardBox = () => {
           onChange={(e) => setInputId(e.target.value)}
         />
         <button onClick={handleSearch}>Search</button>
+        <button onClick={handleClear} className="clear-btn">
+          Clear
+        </button>
       </div>
       {foundCard ? (
         <BingoCard card={foundCard.card} />
@@ -79,12 +80,22 @@ const CardBox = () => {
 };
 
 const BingoCardPage = () => {
+  const [cardType, setCardType] = useState("A100");
+
   return (
     <div className="bingo-page">
-      <CardBox />
-      <CardBox />
-      <CardBox />
-      <CardBox />
+      <div className="card-options">
+        <select value={cardType} onChange={(e) => setCardType(e.target.value)}>
+          <option value="A100">A100</option>
+          <option value="A200">A200</option>
+          <option value="W60">W60</option>
+          <option value="R250">R250</option>
+        </select>
+      </div>
+      <CardBox cardType={cardType} />
+      <CardBox cardType={cardType} />
+      <CardBox cardType={cardType} />
+      <CardBox cardType={cardType} />
     </div>
   );
 };
