@@ -41,6 +41,8 @@ function BingoCardPage({
     const loadBingoCard = async () => {
       try {
         const res = await axios.get("/auth/support/profile", { withCredentials: true });
+        console.log("Support profile response:", res.data);
+
         const bingoCardType = res.data.bingoCardType || "default";
 
         // Try loading the file
@@ -49,6 +51,7 @@ function BingoCardPage({
         if (!cardRes.ok) {
           console.warn(`Card file for type "${bingoCardType}" not found. Falling back to default.`);
           cardRes = await fetch(`/bingoCards/bingoCards.default.json`);
+          console.log("Support profile response:", res.data);
         }
 
         const text = await cardRes.text();
