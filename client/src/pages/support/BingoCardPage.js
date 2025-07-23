@@ -40,7 +40,8 @@ function BingoCardPage({
   useEffect(() => {
     const loadBingoCard = async () => {
       try {
-        const res = await axios.get("/auth/support/profile", { withCredentials: true });
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/auth/support/profile`, { withCredentials: true });
+
         console.log("Support profile response:", res.data);
 
         const bingoCardType = res.data.bingoCardType || "default";
