@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import '../../styles/BingoBoard.css';
 import Topbar from "../../components/TopBar";
 import { FiRefreshCcw } from "react-icons/fi";
-import axios from "axios";
+import axios from "../../api/axios";
 import Sidebar from "../../components/Sidebar";
 import { FaMoneyBillWave, FaEraser, FaSearch, FaGamepad } from "react-icons/fa";
 import { useNavigate, useLocation } from "react-router-dom";
