@@ -1,9 +1,5 @@
 import React, { useState } from "react";
 import "../../styles/mobCartelaStyle.css";
-import cardsA100 from "../../../public/bingoCards/bingoCards.A100.json";
-import cardsA200 from "../../../public/bingoCards/bingoCards.A200.json";
-import cardsW60 from "../../../public/bingoCards/bingoCards.W60.json";
-import cardsR250 from "../../../public/bingoCards/bingoCards.R250.json";
 
 const BingoCard = ({ card }) => {
   const [selectedCells, setSelectedCells] = useState(new Set());
@@ -22,9 +18,7 @@ const BingoCard = ({ card }) => {
         row.map((num, colIdx) => (
           <div
             key={`${colIdx}-${rowIdx}`}
-            className={`bingo-cell ${
-              selectedCells.has(`${colIdx}-${rowIdx}`) ? "selected" : ""
-            }`}
+            className={`bingo-cell ${selectedCells.has(`${colIdx}-${rowIdx}`) ? "selected" : ""}`}
             onClick={() => toggleCell(rowIdx, colIdx)}
           >
             {num === 0 ? "0" : num}
@@ -40,23 +34,20 @@ const CardBox = () => {
   const [cardType, setCardType] = useState("A100");
   const [foundCard, setFoundCard] = useState(null);
 
-  const getCardsData = () => {
-    switch (cardType) {
-      case "A200":
-        return cardsA200;
-      case "W60":
-        return cardsW60;
-      case "R250":
-        return cardsR250;
-      default:
-        return cardsA100
-    }
+  const getCardsData = async () => {
+    const response = await fetch(`/bingoCards/bingoCards.${cardType}.json`);
+    return await response.json();
   };
 
-  const handleSearch = () => {
-    const cardsData = getCardsData();
-    const found = cardsData.find((card) => card.id === parseInt(inputId));
-    setFoundCard(found || null);
+  const handleSearch = async () => {
+    try {
+      const cardsData = await getCardsData();
+      const found = cardsData.find((card) => card.id === parseInt(inputId));
+      setFoundCard(found || null);
+    } catch (error) {
+      console.error("Failed to load cards:", error);
+      setFoundCard(null);
+    }
   };
 
   return (
