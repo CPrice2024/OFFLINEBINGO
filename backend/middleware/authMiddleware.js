@@ -9,22 +9,26 @@ export const protect = (role) => async (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    if (role === "founder") {
-      const user = await Founder.findById(decoded.id);
-      if (!user) return res.status(401).json({ message: "Founder not found" });
-      req.user = user;
-      req.userId = user._id;
-    } else if (role === "support") {
-      const user = await Support.findById(decoded.id);
-      if (!user) return res.status(401).json({ message: "Support not found" });
-      req.user = user;
-      req.userId = user._id;
-    } else {
-      return res.status(403).json({ message: "Invalid role" });
+    // Ensure role matches
+    if (decoded.role !== role) {
+      return res.status(403).json({ message: `Access denied for role: ${decoded.role}` });
     }
+
+    let user;
+    if (role === "founder") {
+      user = await Founder.findById(decoded.id).select("-password");
+    } else if (role === "support") {
+      user = await Support.findById(decoded.id).select("-password");
+    }
+
+    if (!user) return res.status(401).json({ message: `${role} not found` });
+
+    req.user = user;
+    req.userId = user._id;
 
     next();
   } catch (err) {
+    console.error("❌ Token verification failed:", err.message);
     return res.status(401).json({ message: "Token failed" });
   }
 };

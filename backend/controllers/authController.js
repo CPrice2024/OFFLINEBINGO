@@ -368,8 +368,19 @@ export const getFounderTransactions = async (req, res) => {
 // ----------- Support Profile -----------
 export const getSupportProfile = async (req, res) => {
   try {
+    console.log("🔑 Token payload (req.user):", req.user);
+
     const support = await Support.findById(req.user._id).select("-password");
-    if (!support) return res.status(404).json({ message: "Support not found" });
+    if (!support) {
+      console.error("❌ Support not found for ID:", req.user._id);
+      return res.status(404).json({ message: "Support not found" });
+    }
+
+    console.log("✅ Support profile fetched:", {
+      id: support._id,
+      email: support.email,
+      bingoCardType: support.bingoCardType,
+    });
 
     res.json({
       balance: support.balance || 0,
@@ -378,9 +389,11 @@ export const getSupportProfile = async (req, res) => {
       bingoCardType: support.bingoCardType || "default",
     });
   } catch (err) {
+    console.error("❌ getSupportProfile error:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
+
 
 // ----------- Notifications -----------
 export const getNotifications = async (req, res) => {
