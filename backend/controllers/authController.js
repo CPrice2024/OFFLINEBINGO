@@ -375,6 +375,7 @@ export const getSupportProfile = async (req, res) => {
       balance: support.balance || 0,
       name: support.name,
       email: support.email,
+      bingoCardType: support.bingoCardType || "default",
     });
   } catch (err) {
     res.status(500).json({ message: "Server error" });

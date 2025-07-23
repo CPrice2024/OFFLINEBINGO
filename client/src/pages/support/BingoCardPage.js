@@ -36,28 +36,35 @@ function BingoCardPage({
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const { winningCardIds = [], calledNumbers = [] } = location.state || {};
 
+  // Load bingo cards based on support's bingoCardType
   useEffect(() => {
-    const fetchCard = async () => {
+    const loadBingoCard = async () => {
       try {
-        const typeRes = await axios.get(`/support/${userId}/card-type`);
-        const bingoCardType = typeRes.data.bingoCardType || "default";
+        // 1. Get support profile to know card type
+        const res = await axios.get("/auth/support/profile", { withCredentials: true });
+        const bingoCardType = res.data.bingoCardType || "default";
 
-        const cardRes = await fetch(`/bingoCards/bingoCards_${bingoCardType}.json`);
-        const cardData = await cardRes.json();
+        // 2. Try to load from public folder
+        let cardRes = await fetch(`/bingocards/bingocards.${bingoCardType}.json`);
+        if (!cardRes.ok) {
+          console.warn(`Card file for type "${bingoCardType}" not found. Falling back to default.`);
+          cardRes = await fetch(`/bingocards/bingocards.default.json`);
+        }
 
-        setBingoCards(cardData);
-      } catch (error) {
-        console.error("Failed to load bingo cards:", error);
+        const json = await cardRes.json();
+        setBingoCards(json.cards || json); // Update parent state
+      } catch (err) {
+        console.error("Failed to load cards:", err);
         setBingoCards([]);
       } finally {
         setLoading(false);
       }
     };
 
-    if (userId) {
-      fetchCard();
+    if (userRole === "support") {
+      loadBingoCard();
     }
-  }, [userId, setBingoCards]);
+  }, [userRole, setBingoCards]);
 
   useEffect(() => {
     if (startMessage) {
