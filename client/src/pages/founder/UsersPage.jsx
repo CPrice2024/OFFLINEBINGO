@@ -30,7 +30,7 @@ const Users = () => {
     password: "",
     commission: "",
     city: "",
-    bingoCardType: "default",
+    bingoCardType: "A100",
   });
 
   const [openMenuIndex, setOpenMenuIndex] = useState(null);
@@ -136,7 +136,7 @@ const Users = () => {
       password: "",
       commission: support.commission ?? "",
       city: support.city ?? "",
-      bingoCardType: support.bingoCardType || "default",
+      bingoCardType: support.bingoCardType || "A100",
     });
     setEditingSupport(support);
     setShowCreateSupport(true);
@@ -341,7 +341,7 @@ const Users = () => {
               onClick={() => {
                 setShowCreateSupport(false);
                 setEditingSupport(null);
-                setFormData({ name: "", email: "", phone: "", password: "", commission: "", city: "", bingoCardType: "default" });
+                setFormData({ name: "", email: "", phone: "", password: "", commission: "", city: "", bingoCardType: "A100" });
               }}
             >
               <MdClose size={20} />
@@ -366,10 +366,10 @@ const Users = () => {
                required
                className="bingo-select"
                >
-                <option value="default">Default</option>
-                <option value="classic">Classic</option>
-                <option value="patternA">Pattern A</option>
-                <option value="patternB">Pattern B</option>
+                <option value="A100">A100</option>
+                <option value="A200">A200</option>
+                <option value="W60">W60</option>
+                <option value="R250">R250</option>
               </select>
               <button type="submit" className="modal-submit">
                 {editingSupport ? "Update" : "Create"}

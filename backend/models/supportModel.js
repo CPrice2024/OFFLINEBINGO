@@ -10,8 +10,8 @@ const supportSchema = new mongoose.Schema({
   commission: { type: Number, default: 0 },
   bingoCardType: {
     type: String,
-    enum: ["default", "classic", "patternA", "patternB"], 
-    default: "default",
+    enum: ["A100", "A200", "W60", "R250"],
+    default: "A100",
   },
   currentToken: { type: String, default: null },
   createdBy: {
