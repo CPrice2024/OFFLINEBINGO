@@ -75,16 +75,6 @@ const BingoDashboard = ({
   const [highlightedNumber, setHighlightedNumber] = useState(null);
   const [highlightedNumbers, setHighlightedNumbers] = useState([]);
   const [checkingNumbers, setCheckingNumbers] = useState(false);
-
-
-
-
-  
-
-
-  
-
-
   const navigate = useNavigate();
 
 const playCallSound = useCallSound();
@@ -358,12 +348,7 @@ const goToBingoCardPage = () => {
       calledNumbers,
       userId,
     },
-  });
-
-  setTimeout(() => {
-    window.location.reload();
-  }, 1); 
-};
+  });}
 
 const verifyCard = (card) => {
   const { card: cardNumbers } = card;

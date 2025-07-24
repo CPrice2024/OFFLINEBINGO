@@ -191,7 +191,7 @@ function BingoCardPage({
         userId={userId}
         handleLogout={handleLogout}
       />
-      <div className="main-content">
+      <div className="main-contentt">
         <Topbar
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}

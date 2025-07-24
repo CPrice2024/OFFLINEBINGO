@@ -332,7 +332,16 @@
   flex-wrap: wrap;
 }
 
-
+.credit-container {
+    color: rgb(51, 51, 51);
+    display: grid;
+    font-family: "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    grid-template-columns: 1fr;
+    max-width: 1260px;
+    flex: 1 1 0%;
+    gap: 15px;
+    padding: 25px;
+}
 
 .balance-card, .status-card {
     flex: 1 1 220px;

@@ -700,8 +700,16 @@ mark {
   display: flex;
   flex-direction: column;
   overflow: auto;
+  background: #f9f9f9;
+}
+.main-contentt {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
   background: #920000;
 }
+
 
 .topbar {
   height: 60px;
@@ -711,6 +719,7 @@ mark {
   align-items: center;
   padding: 0 16px;
   z-index: 10;
+  
 }
 .dashboard-toggle-button {
   padding: 5px 10px;
