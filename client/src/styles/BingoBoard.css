@@ -1068,17 +1068,17 @@ h3 {
 }
 .board-cell.flashing {
   animation: flashRandom 0.2s ease-in-out infinite alternate;
-  background-color: red;
+  background-color: #800000;
   color: white;
 }
 
 @keyframes flashRandom {
   from {
-    background-color: red;
+    background-color:#800000;
     color: white;
   }
   to {
     background-color: white;
-    color: red;
+    color: #800000;
   }
 }

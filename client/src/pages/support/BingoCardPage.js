@@ -36,31 +36,27 @@ function BingoCardPage({
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const { winningCardIds = [], calledNumbers = [] } = location.state || {};
 
-  // Cache bingoCardType in localStorage
-  const [bingoCardType, setBingoCardType] = useState(
-    () => localStorage.getItem("bingoCardType") || null
-  );
-
+  // Load bingo cards based on support's bingoCardType
   useEffect(() => {
     const loadBingoCard = async () => {
       try {
-        let type = bingoCardType;
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/auth/support/profile`, { withCredentials: true });
 
-        if (!type) {
-          const res = await axios.get(`${process.env.REACT_APP_API_URL}/auth/support/profile`, { withCredentials: true });
-          type = res.data.bingoCardType || "default";
-          setBingoCardType(type);
-          localStorage.setItem("bingoCardType", type);
-        }
+        console.log("Support profile response:", res.data);
 
-        let cardRes = await fetch(`/bingoCards/bingoCards.${type}.json`);
+        const bingoCardType = res.data.bingoCardType || "default";
+
+        // Try loading the file
+        console.log("Fetching bingo cards for type:", bingoCardType);
+        let cardRes = await fetch(`/bingoCards/bingoCards.${bingoCardType}.json`);
         if (!cardRes.ok) {
-          console.warn(`Card file for type "${type}" not found. Falling back to default.`);
+          console.warn(`Card file for type "${bingoCardType}" not found. Falling back to default.`);
           cardRes = await fetch(`/bingoCards/bingoCards.default.json`);
+          console.log("Support profile response:", res.data);
         }
 
         const text = await cardRes.text();
-        const json = JSON.parse(text);
+        const json = JSON.parse(text); // Safe parse (will throw if invalid)
         setBingoCards(json.cards || json);
       } catch (err) {
         console.error("Failed to load cards:", err);
@@ -73,7 +69,7 @@ function BingoCardPage({
     if (userRole === "support") {
       loadBingoCard();
     }
-  }, [userRole, setBingoCards, bingoCardType]);
+  }, [userRole, setBingoCards]);
 
   useEffect(() => {
     if (startMessage) {
@@ -220,8 +216,8 @@ function BingoCardPage({
                   value={commissionPercent}
                   onChange={(e) => setCommissionPercent(Number(e.target.value))}
                 >
-                  {[5, 10, 15, 20, 25, 30, 35, 40].map(p => (
-                    <option key={p} value={p}>{p}%</option>
+                  {[1, 2, 3, 4, 5, 6, 7, 8].map(p => (
+                    <option key={p} value={p}>{p}</option>
                   ))}
                 </select>
                 <button className='new_card_button' onClick={handleSetWinnerAmount}>
