@@ -321,7 +321,6 @@ const restartGame = () => {
 
   // Clear parent states
   if (typeof setCalledNumbers === 'function') setCalledNumbers([]);
-  if (typeof setSelectedCardIds === 'function') setSelectedCardIds([]);
 
   // Restart game
   setIsGameRunning(true);
