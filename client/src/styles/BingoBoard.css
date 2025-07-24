@@ -1066,13 +1066,13 @@ h3 {
     font-weight: 900;
     box-sizing: border-box;
 }
-.board-cell.checking {
-  animation: flashColor 0.3s infinite alternate;
+.board-cell.flashing {
+  animation: flashRandom 0.2s ease-in-out infinite alternate;
   background-color: red;
   color: white;
 }
 
-@keyframes flashColor {
+@keyframes flashRandom {
   from {
     background-color: red;
     color: white;

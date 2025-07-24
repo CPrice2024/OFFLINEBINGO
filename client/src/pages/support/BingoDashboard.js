@@ -73,6 +73,8 @@ const BingoDashboard = ({
   const winnerAmountCalculated = totalPrizePool - commission;
   const [gameStartTrigger, setGameStartTrigger] = useState(0);
   const [checkingNumbers, setCheckingNumbers] = useState(false);
+  const [highlightedNumber, setHighlightedNumber] = useState(null);
+
 
   
 
@@ -453,15 +455,18 @@ useEffect(() => {
 
 
 const handleCheck = () => {
-  playCleanSound();
+  playCleanSound(); // 🔊 Sound
   console.log("✅ Check button clicked");
-  
-  setCheckingNumbers(true);
-  
-  // Stop animation after 3 seconds
+
+  const interval = setInterval(() => {
+    const randomNum = Math.floor(Math.random() * 75) + 1;
+    setHighlightedNumber(randomNum);
+  }, 50); // change number every 50ms (fast)
+
   setTimeout(() => {
-    setCheckingNumbers(false);
-  }, 3000);
+    clearInterval(interval);
+    setHighlightedNumber(null); // stop highlighting
+  }, 3000); // Run for 3 seconds
 };
 
 
@@ -624,7 +629,10 @@ if (selectedCardIds.includes(card.id) && result?.isWinner) {
               return (
                 <div
                   key={colIndex}
-                  className={`board-cell ${calledNumbers?.includes?.(number) ? 'called pop' : ''} ${checkingNumbers ? 'checking' : ''}`}
+                  className={`board-cell 
+  ${calledNumbers?.includes?.(number) ? 'called pop' : ''} 
+  ${highlightedNumber === number ? 'flashing' : ''}`}
+
                 >
                   {number}
                 </div>
