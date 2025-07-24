@@ -72,8 +72,11 @@ const BingoDashboard = ({
   const commission = (commissionPercent / 100) * totalPrizePool;
   const winnerAmountCalculated = totalPrizePool - commission;
   const [gameStartTrigger, setGameStartTrigger] = useState(0);
-  const [checkingNumbers, setCheckingNumbers] = useState(false);
   const [highlightedNumber, setHighlightedNumber] = useState(null);
+  const [highlightedNumbers, setHighlightedNumbers] = useState([]);
+  const [checkingNumbers, setCheckingNumbers] = useState(false);
+
+
 
 
   
@@ -455,18 +458,22 @@ useEffect(() => {
 
 
 const handleCheck = () => {
-  playCleanSound(); // 🔊 Sound
+  playCleanSound(); // 🔊 play sound
   console.log("✅ Check button clicked");
 
   const interval = setInterval(() => {
-    const randomNum = Math.floor(Math.random() * 75) + 1;
-    setHighlightedNumber(randomNum);
-  }, 50); // change number every 50ms (fast)
+    // pick 5 unique random numbers between 1–75
+    const numbers = new Set();
+    while (numbers.size < 5) {
+      numbers.add(Math.floor(Math.random() * 75) + 1);
+    }
+    setHighlightedNumbers(Array.from(numbers));
+  }, 150); // Change every 150ms
 
   setTimeout(() => {
     clearInterval(interval);
-    setHighlightedNumber(null); // stop highlighting
-  }, 3000); // Run for 3 seconds
+    setHighlightedNumbers([]); // Clear after 3 seconds
+  }, 3000);
 };
 
 
