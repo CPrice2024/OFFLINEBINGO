@@ -636,9 +636,10 @@ if (selectedCardIds.includes(card.id) && result?.isWinner) {
               return (
                 <div
                   key={colIndex}
-                  className={`board-cell 
+                 className={`board-cell 
   ${calledNumbers?.includes?.(number) ? 'called pop' : ''} 
-  ${highlightedNumber === number ? 'flashing' : ''}`}
+  ${highlightedNumbers.includes(number) ? 'flashing' : ''}`}
+
 
                 >
                   {number}

@@ -700,7 +700,7 @@ mark {
   display: flex;
   flex-direction: column;
   overflow: auto;
-  background: white;
+  background: #920000;
 }
 
 .topbar {
