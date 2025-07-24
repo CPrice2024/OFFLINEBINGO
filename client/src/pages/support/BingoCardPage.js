@@ -36,27 +36,31 @@ function BingoCardPage({
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const { winningCardIds = [], calledNumbers = [] } = location.state || {};
 
-  // Load bingo cards based on support's bingoCardType
+  // Cache bingoCardType in localStorage
+  const [bingoCardType, setBingoCardType] = useState(
+    () => localStorage.getItem("bingoCardType") || null
+  );
+
   useEffect(() => {
     const loadBingoCard = async () => {
       try {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/auth/support/profile`, { withCredentials: true });
+        let type = bingoCardType;
 
-        console.log("Support profile response:", res.data);
+        if (!type) {
+          const res = await axios.get(`${process.env.REACT_APP_API_URL}/auth/support/profile`, { withCredentials: true });
+          type = res.data.bingoCardType || "default";
+          setBingoCardType(type);
+          localStorage.setItem("bingoCardType", type);
+        }
 
-        const bingoCardType = res.data.bingoCardType || "default";
-
-        // Try loading the file
-        console.log("Fetching bingo cards for type:", bingoCardType);
-        let cardRes = await fetch(`/bingoCards/bingoCards.${bingoCardType}.json`);
+        let cardRes = await fetch(`/bingoCards/bingoCards.${type}.json`);
         if (!cardRes.ok) {
-          console.warn(`Card file for type "${bingoCardType}" not found. Falling back to default.`);
+          console.warn(`Card file for type "${type}" not found. Falling back to default.`);
           cardRes = await fetch(`/bingoCards/bingoCards.default.json`);
-          console.log("Support profile response:", res.data);
         }
 
         const text = await cardRes.text();
-        const json = JSON.parse(text); // Safe parse (will throw if invalid)
+        const json = JSON.parse(text);
         setBingoCards(json.cards || json);
       } catch (err) {
         console.error("Failed to load cards:", err);
@@ -69,7 +73,7 @@ function BingoCardPage({
     if (userRole === "support") {
       loadBingoCard();
     }
-  }, [userRole, setBingoCards]);
+  }, [userRole, setBingoCards, bingoCardType]);
 
   useEffect(() => {
     if (startMessage) {
