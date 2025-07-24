@@ -72,6 +72,8 @@ const BingoDashboard = ({
   const commission = (commissionPercent / 100) * totalPrizePool;
   const winnerAmountCalculated = totalPrizePool - commission;
   const [gameStartTrigger, setGameStartTrigger] = useState(0);
+  const [checkingNumbers, setCheckingNumbers] = useState(false);
+
   
 
 
@@ -451,10 +453,17 @@ useEffect(() => {
 
 
 const handleCheck = () => {
-  playCleanSound(); 
+  playCleanSound();
   console.log("✅ Check button clicked");
- 
+  
+  setCheckingNumbers(true);
+  
+  // Stop animation after 3 seconds
+  setTimeout(() => {
+    setCheckingNumbers(false);
+  }, 3000);
 };
+
 
 
 const verifyAndShowCard = () => {
@@ -615,7 +624,7 @@ if (selectedCardIds.includes(card.id) && result?.isWinner) {
               return (
                 <div
                   key={colIndex}
-                  className={`board-cell ${calledNumbers?.includes?.(number) ? 'called pop' : ''}`}
+                  className={`board-cell ${calledNumbers?.includes?.(number) ? 'called pop' : ''} ${checkingNumbers ? 'checking' : ''}`}
                 >
                   {number}
                 </div>
