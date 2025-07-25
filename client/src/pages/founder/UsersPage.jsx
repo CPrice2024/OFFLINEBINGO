@@ -32,7 +32,7 @@ const Users = () => {
     password: "",
     commission: "",
     city: "",
-    agent: "",
+    superAgent: "",
     bingoCardType: "A100",
   });
 
@@ -159,7 +159,7 @@ useEffect(() => {
       password: "",
       commission: support.commission ?? "",
       city: support.city ?? "",
-      agent: support.agent || "",
+      superAgent: support.superAgent || "",
 
       bingoCardType: support.bingoCardType || "A100",
     });
@@ -271,7 +271,7 @@ useEffect(() => {
                   <th><FaChartLine /> Balance(Birr)</th>
                   <th><FaChartLine /> Commission</th>
                   <th><FaUsers /> City</th>
-                  <th>Agent</th> 
+                  <th>Role</th> 
                   <th><FaUsers /> Bingo Card Type</th>
                   <th><AiOutlineCalendar /> Created</th>
                   <th>Actions</th>
@@ -386,7 +386,7 @@ useEffect(() => {
               <input type="text" name="phone" placeholder="Phone" value={formData.phone} onChange={handleInputChange} required />
               <input type="text" name="commission" placeholder="Commission" value={formData.commission} onChange={handleInputChange} required />
               <input type="text" name="city" placeholder="City" value={formData.city} onChange={handleInputChange} required />
-              <input type="text" name="agent" placeholder="Agent" list="superAgentList" value={formData.agent} onChange={handleInputChange} required/>
+              <input type="text" name="superAgent" placeholder="superAgent" list="superAgentList" value={formData.superAgent} onChange={handleInputChange} required/>
               <datalist id="superAgentList"> {superAgents.map((agent) => (
                 <option key={agent._id} value={agent.name} />
                 ))}
