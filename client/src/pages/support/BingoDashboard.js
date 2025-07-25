@@ -11,12 +11,10 @@ import bingoBall5 from '../../assets/bingo-ball-5.png';
 import { getPatternCells } from '../../utils/patternUtils';
 
 
-
-
-
 import {
   useCallSound,
   usePauseSound,
+  useReadySound,
   useCleanSound,
   useVerifySuccessSound,
   useVerifyFailSound
@@ -79,6 +77,7 @@ const BingoDashboard = ({
 
 const playCallSound = useCallSound();
 const playPauseSound = usePauseSound();
+const playReadySound = useReadySound();
 const playCleanSound = useCleanSound();
 const playSuccessSound = useVerifySuccessSound();
 const playFailSound = useVerifyFailSound();
@@ -441,10 +440,14 @@ useEffect(() => {
   }
 }, [startMessage]);
 
-
 const handleCheck = () => {
   playCleanSound(); // 🔊 play sound
   console.log("✅ Check button clicked");
+};
+
+const handleMix = () => {
+  playReadySound(); // 🔊 play sound
+  console.log("✅ Mix button clicked");
 
   const interval = setInterval(() => {
     // pick 5 unique random numbers between 1–75
@@ -680,6 +683,14 @@ if (selectedCardIds.includes(card.id) && result?.isWinner) {
 <button
   className="button_board"
   onClick={handleCheck}
+  style={{ display: 'flex', alignItems: 'center', gap: '5px' }}
+>
+  <FaCheck />
+  Shuffle
+</button>
+<button
+  className="button_board"
+  onClick={handleMix}
   style={{ display: 'flex', alignItems: 'center', gap: '5px' }}
 >
   <FaCheck />

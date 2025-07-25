@@ -3,6 +3,7 @@ import useSound from 'use-sound';
 // ✅ Functional sounds
 import pauseSoundFile from '../sounds/pause.mp3';
 import cleanSoundFile from '../sounds/be-ready.mp3';
+import readySoundFile from '../sounds/be ready.mp3';
 import verifySuccessFile from '../sounds/success.mp3';
 import verifyFailFile from '../sounds/Fail.mp3';
 
@@ -120,6 +121,10 @@ export const usePauseSound = () => {
 
 export const useCleanSound = () => {
   const [play] = useSound(cleanSoundFile);
+  return play;
+};
+export const useReadySound = () => {
+  const [play] = useSound(readySoundFile);
   return play;
 };
 

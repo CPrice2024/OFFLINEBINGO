@@ -198,7 +198,7 @@ function BingoCardPage({
           isCollapsed={!sidebarOpen}
           userId={userId}
         />
-        <div className="bingo-card-page">
+        <div className="bingo-card-pagee">
           {/* Winner amount input */}
           <div className="winner-winner">
             {!isWinnerAmountSet ? (
