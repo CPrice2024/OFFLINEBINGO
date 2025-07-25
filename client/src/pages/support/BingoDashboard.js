@@ -686,7 +686,7 @@ if (selectedCardIds.includes(card.id) && result?.isWinner) {
   style={{ display: 'flex', alignItems: 'center', gap: '5px' }}
 >
   <FaCheck />
-  Shuffle
+  ዝግጁ!
 </button>
 <button
   className="button_board"
@@ -694,7 +694,7 @@ if (selectedCardIds.includes(card.id) && result?.isWinner) {
   style={{ display: 'flex', alignItems: 'center', gap: '5px' }}
 >
   <FaCheck />
-  ዝግጁ!
+  Shuffle
 </button>
         </div>
         <div className="speed-control">
