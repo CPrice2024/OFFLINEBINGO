@@ -217,7 +217,7 @@ function BingoCardPage({
                   onChange={(e) => setCommissionPercent(Number(e.target.value))}
                 >
                   {[1, 2, 3, 4, 5, 6, 7, 8].map(p => (
-                    <option key={p} value={p}>{p}</option>
+                    <option key={p} value={p}>{p}%</option>
                   ))}
                 </select>
                 <button className='new_card_button' onClick={handleSetWinnerAmount}>
