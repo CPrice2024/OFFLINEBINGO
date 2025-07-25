@@ -57,7 +57,7 @@ const SupportSignin = () => {
       setUserName(res.data.name);
       setUserEmail(res.data.email);
 
-      navigate(redirectToSales ? "/sales" : "/support/dashboard");
+      navigate(redirectToSales ? "/sales" : "/Agent/dashboard");
     } catch (err) {
       console.error("Signin failed:", err);
       const msg = err.response?.data?.message || "Sign-in failed. Please try again.";

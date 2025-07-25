@@ -119,7 +119,7 @@ function BingoCardPage({
   };
 
   const handleNavigateToGame = () => {
-    navigate("/support/dashboard", {
+    navigate("/Agent/dashboard", {
       state: {
         calledNumbers,
         winningCardIds,

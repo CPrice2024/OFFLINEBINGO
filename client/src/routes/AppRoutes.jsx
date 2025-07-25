@@ -38,16 +38,16 @@ const AppRoutes = () => {
     <Routes>
       {/* Public Routes */}
       <Route path="/" element={<SupportSignin />} />
-      <Route path="/mobCartela" element={<MobCartela />} />
-      
+      <Route path="/mobileCartela" element={<MobCartela />} />
+
 
       
 
       {/* Founder Routes */}
-      <Route path="//signin" element={<FounderSignin />} />
+      <Route path="/main/signin" element={<FounderSignin />} />
       
       <Route
-        path="/founder/Users"
+        path="/main/Users"
         element={
           <ProtectedRoute allowedRole="founder">
             <Users />
@@ -55,7 +55,7 @@ const AppRoutes = () => {
         }
       />
       <Route
-        path="/founder/Credit"
+        path="/main/Credit"
         element={
           <ProtectedRoute allowedRole="founder">
             <CreditPage userId={userId} />
@@ -63,7 +63,7 @@ const AppRoutes = () => {
         }
       />
       <Route
-        path="/founder/dashboard"
+        path="/main/dashboard"
         element={
           <ProtectedRoute allowedRole="founder">
             <MainDashboard
@@ -93,18 +93,18 @@ const AppRoutes = () => {
 
       {/* Support Routes */}
       <Route
-        path="/support/signin"
+        path="/Agent/signin"
         element={
           <SupportSignin setUserId={setUserId} setUserName={setUserName} />
         }
       />
       <Route
-  path="/support/dashboard"
-  element={
-    <ProtectedRoute allowedRole="support">
-      <SupportDashboard
-        topbarRef={topbarRef}
-        userId={userId}
+        path="/Agent/dashboard"
+        element={
+          <ProtectedRoute allowedRole="support">
+            <SupportDashboard
+              topbarRef={topbarRef}
+              userId={userId}
         userName={userName} 
         calledNumbers={calledNumbers}
         setCalledNumbers={setCalledNumbers}
@@ -147,7 +147,7 @@ const AppRoutes = () => {
         }
       />
       <Route
-        path="/bingocartela"
+        path="/BingoCartela"
         element={
           <ProtectedRoute allowedRole="support">
             <BingoCardPage

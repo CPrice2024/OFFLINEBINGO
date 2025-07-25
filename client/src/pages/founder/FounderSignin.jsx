@@ -59,7 +59,7 @@ const FounderSignin = () => {
       setUserName(res.data.name);
       setUserEmail(res.data.email);
 
-      navigate(redirectToSales ? "/founder/results" : "/founder/dashboard");
+      navigate(redirectToSales ? "/main/results" : "/main/dashboard");
     } catch (err) {
       console.error("Signin failed:", err);
       const msg = err.response?.data?.message || "Sign-in failed. Please try again.";
