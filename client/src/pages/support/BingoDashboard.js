@@ -557,7 +557,7 @@ if (selectedCardIds.includes(card.id) && result?.isWinner) {
       <div className="verify-section pop-style">
         <input
           type="number"
-          className="winner-amount-input"
+          className="winner-amount-inputt"
           placeholder="ካርቴላ ቁጥር"
           value={inputCardId}
           onChange={(e) => setInputCardId(e.target.value)}

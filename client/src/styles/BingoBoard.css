@@ -447,6 +447,15 @@ element.style {
   transform: scale(1.007);
 }
 
+.winner-amount-inputt {
+    background-color: #f9f9f9;
+    border: .5px solid #898989bb;
+    border-radius: 5px;
+    color: maroon;
+    font-size: 13px;
+    margin-bottom: 15px;
+    padding: 14px 6px;
+}
 .winner-amount-input {
     background-color: #f9f9f9;
     border: .5px solid #898989bb;
