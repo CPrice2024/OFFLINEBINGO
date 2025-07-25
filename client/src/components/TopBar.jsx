@@ -271,7 +271,7 @@ const Topbar = forwardRef(({ isCollapsed, sidebarOpen, setSidebarOpen }, ref) =>
                           <div>
                             <strong className="notification-title">Balance Received</strong>
                             <div className="notification-text">
-                              You received <strong className="notification-title">{notif.amount} ብር</strong> from 0942953765
+                              You received <strong className="notification-title">{notif.amount} ብር</strong> from 09--------{notif.senderEmail}
                             </div>
                             <small>{notif.time}</small>
                             <button className="mark-read" onClick={() => markAsRead(notif._id)}>

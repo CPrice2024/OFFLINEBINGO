@@ -692,7 +692,6 @@ if (selectedCardIds.includes(card.id) && result?.isWinner) {
   onClick={handleMix}
   style={{ display: 'flex', alignItems: 'center', gap: '5px' }}
 >
-  <FaCheck />
   Shuffle
 </button>
         </div>
