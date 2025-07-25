@@ -185,20 +185,20 @@
     transition: background 0.2s;
 }
 .bingo-select {
-    padding: 10px 14px;
-    margin-top: 4px;
-    font-size: 16px;
-    border-radius: 8px;
-    background-color: #f9f9f9;
-    color: #333;
-    outline: none;
-    cursor: pointer;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    width: 100%;
-    max-width: 300px;
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    color: #686868;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 4px;
+    max-width: 327px;
+    outline: none;
+    padding: 10px 14px;
+    transition: border-color .3s ease, box-shadow .3s ease;
+    width: 100%;
 }
 .dashboard-filters button:focus {
   outline: none;
@@ -443,17 +443,17 @@ mark {
 }
 
 .create-support-modal {
+    background: rgba(161, 0, 0, .954);
+    border-radius: 8px;
+    box-shadow: 0 0 15px #000000;
+    left: 50%;
+    max-width: 382px;
+    padding: 2rem;
     position: fixed;
     top: 50%;
-    left: 50%;
     transform: translate(-50%, -50%);
-    background: rgba(161, 0, 0, 0.954);
-    z-index: 1000;
-    padding: 2rem;
-    border-radius: 8px;
     width: 87%;
-    max-width: 312px;
-    box-shadow: 0 0 15px rgb(0 0 0 / 72%);
+    z-index: 1000;
 }
 .create-support-modal h2 {
   margin-top: 0;
@@ -506,7 +506,7 @@ mark {
     padding: 6px 13px;
     width: 87px;
     margin-top: 15px;
-    margin-left: 83px;
+    margin-left: 114px;
 }
 /* Create Support Modal Styles */
 
