@@ -272,73 +272,33 @@ useEffect(() => {
                   <th><FaRegChartBar /> Commission</th>
                   <th><FaMapMarkerAlt /> City</th>
                   <th><FaUser /> Role</th>
+                  <th>Super Agent</th>
                   <th><FaRegIdCard /> Bingo Card Type</th>
                   <th><AiOutlineCalendar /> Created</th>
                   <th><FaEllipsisH /> Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {currentSupports.length > 0 ? (
-                  currentSupports.map((support, index) => (
-                    <tr key={support._id}>
-                      <td>{indexOfFirstItem + index + 1}</td>
-                      <td>{support.name}</td>
-                      <td>{support.email}</td>
-                      <td>{support.phone}</td>
-                      <td
-                        style={{
-                          color: support.balance < 50 ? "#96010dff" : "#2c8a00ff",
-                          fontWeight: "bold",
-                        }}
-                      >
-                        ${support.balance?.toLocaleString() ?? "0"}
-                      </td>
-                      <td>{support.commission ? `${support.commission}%` : "-"}</td>
-                      <td>{support.city}</td>
-                      <td>{support.superAgent ? support.superAgent.name : "N/A"}</td>
-                      <td>{support.bingoCardType}</td>
-                      <td>{support.createdAt.slice(0, 10)}</td>
-                      <td style={{ position: "relative" }}>
-                        <button
-                          onClick={() =>
-                            setOpenMenuIndex(openMenuIndex === index ? null : index)
-                          }
-                          className="action-dots-btn"
-                        >
-                          <svg stroke="#9b0000" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="20" width="20" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
-                        </button>
-                        {openMenuIndex === index && (
-                          <div
-                            ref={(el) => (menuRefs.current[index] = el)}
-                            className="action-dropdown"
-                          >
-                            <button
-                              className="dropdown-item"
-                              onClick={() => {
-                                handleEditSupport(support);
-                                setOpenMenuIndex(null);
-                              }}
-                            >
-                              Edit
-                            </button>
-                            <button
-                              className="dropdown-item"
-                              onClick={() => {
-                                deleteSupport(support._id);
-                                setOpenMenuIndex(null);
-                              }}
-                            >
-                              Delete
-                            </button>
-                          </div>
-                        )}
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr><td colSpan="8">No supports found.</td></tr>
-                )}
-              </tbody>
+  {supports.map((support, index) => (
+    <tr key={support._id}>
+      <td>{index + 1}</td>
+      <td>{support.name}</td>
+      <td>{support.email}</td>
+      <td>{support.phone}</td>
+      <td style={{ color: support.balance > 0 ? "green" : "red" }}>
+        ${support.balance}
+      </td>
+      <td>{support.commission}%</td>
+      <td>{support.city}</td>
+      <td>{support.role || "N/A"}</td>
+      <td>{support.superAgent || "agent"}</td> {/* ✅ Add this */}
+      <td>{support.bingoCardType || "default"}</td>
+      <td>{new Date(support.createdAt).toISOString().slice(0, 10)}</td>
+      <td> ... </td>
+    </tr>
+  ))}
+</tbody>
+
             </table>
           </div>
 

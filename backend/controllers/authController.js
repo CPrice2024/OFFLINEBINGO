@@ -246,7 +246,9 @@ export const getSupportTransactions = async (req, res) => {
 
 export const getSupports = async (req, res) => {
   try {
-    const supports = await Support.find({ createdBy: req.user._id }).select("-password");
+    const supports = await Support.find({ createdBy: req.user._id })
+    .select("-password")
+  .populate("superAgent", "name");
     res.json(supports);
   } catch (error) {
     res.status(500).json({ message: "Failed to fetch supports", error: error.message });
