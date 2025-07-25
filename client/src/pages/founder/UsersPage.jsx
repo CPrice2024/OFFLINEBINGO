@@ -70,7 +70,7 @@ const Users = () => {
   // Auth check + fetch
   useEffect(() => {
     if (userRole !== "founder") {
-      navigate("/founder/signin");
+      navigate("/main/signin");
       return;
     }
     fetchSupports();
@@ -145,7 +145,7 @@ const Users = () => {
     const handleLogout = async () => {
     try {
       await axios.post("/auth/logout", {}, { withCredentials: true });
-      navigate("/founder/signin");
+      navigate("/main/signin");
     } catch (err) {
       console.error("Logout error:", err);
     }
@@ -156,15 +156,15 @@ const Users = () => {
         <button className="sidebar-toggle" onClick={() => setSidebarOpen(!sidebarOpen)} />
       </div>
       <nav className="sidebar-nav">
-          <button onClick={() => navigate("/founder/dashboard")} className="sidebar-link">
+          <button onClick={() => navigate("/main/dashboard")} className="sidebar-link">
             <FaUsers className="nav-icon" />
                 {sidebarOpen && <span className="nav-label">Dashboard</span>}
           </button>
-        <button onClick={() => navigate("/founder/Users")} className="sidebar-link">
+        <button onClick={() => navigate("/main/Users")} className="sidebar-link">
           <FaChartLine className="nav-icon" />
           {sidebarOpen && <span className="nav-label">Users</span>}
         </button>
-        <button onClick={() => navigate("/founder/Credit")} className="sidebar-link">
+        <button onClick={() => navigate("/main/Credit")} className="sidebar-link">
           <FaCreditCard className="nav-icon" />
           {sidebarOpen && <span className="nav-label">Credit</span>}
         </button>

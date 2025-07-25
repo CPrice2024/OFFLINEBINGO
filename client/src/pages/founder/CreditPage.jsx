@@ -132,15 +132,15 @@ const fetchBalanceFromBackend = async () => {
           </button>
         </div>
         <nav className="sidebar-nav">
-          <button onClick={() => navigate("/founder/dashboard")} className="sidebar-link">
+          <button onClick={() => navigate("/main/dashboard")} className="sidebar-link">
             <FaUsers className="nav-icon" />
                 {sidebarOpen && <span className="nav-label">Dashboard</span>}
           </button>
-          <button onClick={() => navigate("/founder/Users")} className="sidebar-link">
+          <button onClick={() => navigate("/main/Users")} className="sidebar-link">
             <FaChartLine className="nav-icon" />
     {sidebarOpen && <span className="nav-label">Users</span>}
           </button>
-          <button onClick={() => navigate("/founder/Credit")} className="sidebar-link">
+          <button onClick={() => navigate("/main/Credit")} className="sidebar-link">
             <FaCreditCard className="nav-icon" />
     {sidebarOpen && <span className="nav-label">Credit</span>}
           </button>
@@ -163,7 +163,7 @@ const fetchBalanceFromBackend = async () => {
     const handleLogout = async () => {
     try {
       await axios.post("/auth/logout", {}, { withCredentials: true });
-      navigate("/founder/signin");
+      navigate("/main/signin");
     } catch (err) {
       console.error("Logout error:", err);
     }

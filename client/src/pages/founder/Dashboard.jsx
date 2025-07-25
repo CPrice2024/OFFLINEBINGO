@@ -88,14 +88,14 @@ const PIE_COLORS = ["#4caf50", "#006fcaff", "#ff9800", "#920000", "#580068ff", "
   const [activeIndex, setActiveIndex] = useState(null);
   useEffect(() => {
     if (!userId) {
-      navigate("/founder/dashboard");
+      navigate("/main/dashboard");
     }
   }, [userId, navigate]);
 
   const fetchTransactions = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("/founder/transactions", {
+      const res = await axios.get("/main/transactions", {
         params: {
           page,
           limit,
@@ -198,7 +198,7 @@ const computeReceiverCutData = (transactions) => {
     const handleLogout = async () => {
     try {
       await axios.post("/auth/logout", {}, { withCredentials: true });
-      navigate("/founder/signin");
+      navigate("/main/signin");
     } catch (err) {
       console.error("Logout error:", err);
     }
@@ -210,15 +210,15 @@ const computeReceiverCutData = (transactions) => {
         <button class="sidebar-toggle"></button>
         </div>
       <nav className="sidebar-nav">
-        <button onClick={() => navigate("/founder/dashboard")} className="sidebar-link">
+        <button onClick={() => navigate("/main/dashboard")} className="sidebar-link">
           <FaUsers className="nav-icon" />
           {sidebarOpen && <span className="nav-label">Dashboard</span>}
         </button>
-        <button onClick={() => navigate("/founder/Users")} className="sidebar-link">
+        <button onClick={() => navigate("/main/Users")} className="sidebar-link">
           <FaChartLine className="nav-icon" />
           {sidebarOpen && <span className="nav-label">Users</span>}
         </button>
-        <button onClick={() => navigate("/founder/Credit")} className="sidebar-link">
+        <button onClick={() => navigate("/main/Credit")} className="sidebar-link">
           <FaCreditCard className="nav-icon" />
           {sidebarOpen && <span className="nav-label">Credit</span>}
         </button>
