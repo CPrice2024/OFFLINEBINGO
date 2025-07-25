@@ -64,7 +64,6 @@ const BingoDashboard = ({
   const dashboardRef = useRef(null);
   const hasSavedSummary = useRef(false);
   const [animateBall, setAnimateBall] = useState(false);
-  const [isSavingSummary, setIsSavingSummary] = useState(false);
   const [startMessage, setStartMessage] = useState('');
   const totalPrizePool = cardCount * eachCardAmount;
   const commission = (commissionPercent / 100) * totalPrizePool;
@@ -248,7 +247,7 @@ const deductCommission = async () => {
 
 const startGame = async () => {
   if (!isGameRunning && !hasSavedSummary.current) {
-    if (!userId || commissionPercent <= 5|| cardCount <= 1 || eachCardAmount <= 10) {
+    if (!userId || commissionPercent <= 5|| cardCount <= 1 || eachCardAmount <= 9) {
       setStartMessage("⛔ ጨዋታ ለማስጀመር መጀመሪያ ደራሽ ያዘጋጁ! እንደገና ይሞክሩ።");
       return;
     }

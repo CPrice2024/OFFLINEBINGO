@@ -216,9 +216,14 @@ function BingoCardPage({
                   value={commissionPercent}
                   onChange={(e) => setCommissionPercent(Number(e.target.value))}
                 >
-                  {[1, 2, 3, 4, 5, 6, 7, 8].map(p => (
-                    <option key={p} value={p}>{p}%</option>
-                  ))}
+                  <option value={5}>1</option>
+                  <option value={10}>2</option>
+                  <option value={15}>3</option>
+                  <option value={20}>4</option>
+                  <option value={25}>5</option>
+                  <option value={30}>6</option>
+                  <option value={35}>7</option>
+                  <option value={40}>8</option>
                 </select>
                 <button className='new_card_button' onClick={handleSetWinnerAmount}>
                   <FaMoneyBillWave style={{ marginRight: '8px' }} /> Amount
