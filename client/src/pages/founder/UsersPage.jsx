@@ -5,7 +5,7 @@ import "../../styles/dashboardStyle.css";
 import { FiMoreVertical } from "react-icons/fi";
 import { MdEmail, MdPhone, MdClose } from "react-icons/md";
 import { AuthContext } from "../../context/AuthContext";
-import { FaUser, FaUsers, FaChartLine, FaCreditCard } from "react-icons/fa";
+import { FaUser, FaUsers, FaChartLine, FaCreditCard, FaRegChartBar, FaMapMarkerAlt, FaRegIdCard, FaEllipsisH } from "react-icons/fa";
 import { AiOutlineCalendar } from "react-icons/ai";
 import TopBar from "../../components/TopBar";
 
@@ -269,12 +269,12 @@ useEffect(() => {
                   <th><MdEmail /> Email</th>
                   <th><MdPhone /> Phone</th>
                   <th><FaChartLine /> Balance(Birr)</th>
-                  <th><FaChartLine /> Commission</th>
-                  <th><FaUsers /> City</th>
-                  <th>Role</th> 
-                  <th><FaUsers /> Bingo Card Type</th>
+                  <th><FaRegChartBar /> Commission</th>
+                  <th><FaMapMarkerAlt /> City</th>
+                  <th><FaUser /> Role</th>
+                  <th><FaRegIdCard /> Bingo Card Type</th>
                   <th><AiOutlineCalendar /> Created</th>
-                  <th>Actions</th>
+                  <th><FaEllipsisH /> Actions</th>
                 </tr>
               </thead>
               <tbody>
