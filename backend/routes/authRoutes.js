@@ -21,6 +21,7 @@ import {
   logout,
   markNotificationAsRead,
   deductCommission,
+  getSuperAgents,
 } from "../controllers/authController.js";
 
 import { protect } from "../middleware/authMiddleware.js";
@@ -54,6 +55,9 @@ router.patch("/support/notifications/:id", protect("support"), markNotificationA
 router.post("/support/deduct", protect("support"), deductCommission);
 router.get("/support/:id/card-type", protect("support"), getSupportCardType);
 router.get("/support/:id", protect("support"), getSupportById);
+router.get('/support/super-agents', protect("founder"), getSuperAgents);
+
+
 
 
 

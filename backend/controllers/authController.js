@@ -86,7 +86,17 @@ export const updateSupport = async (req, res) => {
 // ----------- Support -----------
 export const signupSupport = async (req, res) => {
   try {
-    const { name, email, password, phone, city, commission, bingoCardType } = req.body;
+    const {
+      name,
+      email,
+      password,
+      phone,
+      city,
+      commission,
+      bingoCardType,
+      role = "agent", // Default role
+      superAgentName, // Optional field if agent
+    } = req.body;
 
     const existingSupport = await Support.findOne({ email });
     if (existingSupport) {
@@ -95,15 +105,38 @@ export const signupSupport = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    let superAgentId = null;
+
+    if (role === "agent" && superAgentName) {
+      // Try to find existing super agent
+      let superAgent = await Support.findOne({ name: superAgentName, role: "super-agent" });
+
+      // Create super-agent if doesn't exist
+      if (!superAgent) {
+        superAgent = await Support.create({
+          name: superAgentName,
+          email: `${Date.now()}-${Math.random()}@auto.superagent`, // dummy unique email
+          password: hashedPassword,
+          phone: "0000000000", // default dummy
+          role: "super-agent",
+          createdBy: req.user._id,
+        });
+      }
+
+      superAgentId = superAgent._id;
+    }
+
     const support = new Support({
       name,
       email,
       password: hashedPassword,
       phone,
       city,
-      commission: commission || "0",
-      bingoCardType: bingoCardType || "default",
+      commission: commission || 0,
+      bingoCardType: bingoCardType || "A100",
       createdBy: req.user._id,
+      role,
+      superAgent: superAgentId,
     });
 
     await support.save();
@@ -115,6 +148,19 @@ export const signupSupport = async (req, res) => {
     res.status(500).json({ message: "Internal server error", error: error.message });
   }
 };
+
+// In authController.js
+export const getSuperAgents = async (req, res) => {
+  try {
+    const superAgents = await Support.find({ role: "super-agent" }).select("name _id");
+    res.status(200).json(superAgents);
+  } catch (error) {
+    console.error("Failed to fetch super agents", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+
 export const getSupportById = async (req, res) => {
   try {
     const { id } = req.params;

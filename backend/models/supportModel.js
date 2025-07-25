@@ -8,6 +8,16 @@ const supportSchema = new mongoose.Schema({
   city: { type: String, required: false },
   balance: { type: Number, default: 0 },
   commission: { type: Number, default: 0 },
+  role: {
+    type: String,
+    enum: ["agent", "super-agent"],
+    default: "agent",
+  },
+  superAgent: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Support",
+    default: null,
+  },
   bingoCardType: {
     type: String,
     enum: ["A100", "A200", "W60", "R250"],

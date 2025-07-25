@@ -95,7 +95,7 @@ const PIE_COLORS = ["#4caf50", "#006fcaff", "#ff9800", "#920000", "#580068ff", "
   const fetchTransactions = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("/main/transactions", {
+      const res = await axios.get("/founder/transactions", {
         params: {
           page,
           limit,
