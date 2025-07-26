@@ -12,10 +12,15 @@ const BingoCard = ({ card }) => {
     setSelectedCells(updated);
   };
 
+  // Transpose the card: columns instead of rows
+  const transposedCard = card[0].map((_, colIdx) =>
+    card.map((_, rowIdx) => card[rowIdx][colIdx])
+  );
+
   return (
     <div className="bingo-grid">
-      {card.map((row, rowIdx) =>
-        row.map((num, colIdx) => (
+      {transposedCard.map((col, colIdx) =>
+        col.map((num, rowIdx) => (
           <div
             key={`${colIdx}-${rowIdx}`}
             className={`bingo-cell ${
