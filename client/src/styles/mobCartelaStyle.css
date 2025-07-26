@@ -61,6 +61,7 @@
 .card-search {
     display: flex;
     margin-bottom: 10px;
+    width: 300px;
     gap: 10px;
 }
 .card-search input {
