@@ -74,6 +74,8 @@ const BingoDashboard = ({
   const [highlightedNumbers, setHighlightedNumbers] = useState([]);
   const [checkingNumbers, setCheckingNumbers] = useState(false);
   const navigate = useNavigate();
+  const [isFirstFourWinner, setIsFirstFourWinner] = useState(false);
+
 
 const playCallSound = useCallSound();
 const playPauseSound = usePauseSound();
@@ -486,28 +488,24 @@ const verifyAndShowCard = () => {
     return;
   }
 
-const { isWinner, winType, matchedPatterns } = verifyCard(card);
-
+  const { isWinner, winType, matchedPatterns } = verifyCard(card);
   const winAmount = calculateAdjustedWinningAmount();
 
   if (isWinner) {
- const patternText =
-  winType === 'pattern'
-    ? ` pattern(s): ${matchedPatterns?.join(", ") || 'default'} `
-    : '';
+    const patternText =
+      winType === 'pattern'
+        ? ` pattern(s): ${matchedPatterns?.join(", ") || 'default'} `
+        : '';
 
-setStartMessage(
-  `🎉 ቢንጎ! ካርቴላ ${cardId} አሸንፏል${patternText}የሽልማት መጠን ${winAmount} ብር`
-);
+    setStartMessage(
+      `🎉 ቢንጎ! ካርቴላ ${cardId} አሸንፏል${patternText}የሽልማት መጠን ${winAmount} ብር`
+    );
 
-
-  playSuccessSound();
-
+    playSuccessSound();
 
     if (!winningCards.includes(cardId)) {
       const newWinners = [...winningCards, cardId];
       setWinningCards(newWinners);
-
       saveSummaryToBackend(newWinners);
     }
   } else {
@@ -516,8 +514,33 @@ setStartMessage(
   }
 
   setSelectedCard(card);
+
+  // ✅ Use the first 30 called numbers
+  const firstFour = calledNumbers.slice(0, 30);
+
+  const checkFirstThirtyWin = () => {
+    const { card: cardNumbers } = card;
+    const isNumberCalled = (num) => num === 0 || firstFour.includes(num);
+
+    const horizontalWin = cardNumbers.some(row => row.every(isNumberCalled));
+    const verticalWin = cardNumbers[0].some((_, colIndex) =>
+      cardNumbers.every(row => isNumberCalled(row[colIndex]))
+    );
+    const diagonal1 = cardNumbers.every((row, idx) => isNumberCalled(row[idx]));
+    const diagonal2 = cardNumbers.every((row, idx) => isNumberCalled(row[4 - idx]));
+    const cornersWin =
+      isNumberCalled(cardNumbers[0][0]) &&
+      isNumberCalled(cardNumbers[0][4]) &&
+      isNumberCalled(cardNumbers[4][0]) &&
+      isNumberCalled(cardNumbers[4][4]);
+
+    return horizontalWin || verticalWin || diagonal1 || diagonal2 || cornersWin;
+  };
+
+  setIsFirstFourWinner(checkFirstThirtyWin()); // 💡 You can rename this to `setIsFirstThirtyWinner` if you want
   setShowCardModal(true);
 };
+
   useEffect(() => {
     if (selectedCardIds.length > 0 && calledNumbers.length > 0) {
       const newWinners = [];
@@ -767,6 +790,13 @@ if (selectedCardIds.includes(card.id) && result?.isWinner) {
   </div>
 ))}
     </div>
+{isFirstFourWinner && (
+  <div className="first-four-msg" style={{ marginTop: '12px', fontWeight: 'bold', color: '#1b5e20', textAlign: 'center' }}>
+    🎯 ይህ ካርቴላ በመጀመሪያ 4 ጥሪ በማሸነፉ ምክንያት ተጨማሪ የ10000 ብር ቦነስ ተሸልመዋል!!
+  </div>
+)}
+
+
   </div>
 </div>
 

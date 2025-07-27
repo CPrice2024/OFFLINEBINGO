@@ -12,6 +12,14 @@
   align-items: center;
   z-index: 999;
 }
+
+element.style {
+    margin-top: 12px;
+    font-weight: bold;
+    color: rgb(205 0 0);
+    font-size: large;
+    text-align: center;
+}
 .card-modal {
     background-color: #ffffff;
     border-radius: 10px;
@@ -20,7 +28,7 @@
     border-style: solid;
     width: 92%;
     max-width: 391px;
-    height: 470px;
+    height: 498px;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
     z-index: 1000;
     position: relative;
