@@ -62,6 +62,13 @@ useEffect(() => {
     }
   }, [location?.state, setCommissionPercent, setEachCardAmount, setCardCount]);
 
+  const resetGameState = () => {
+  setCalledNumbers([]);
+  setWinnerAmount(0); // Reset winner amount
+  setWinningCardIds([]);
+  setEachCardAmount(0);
+  setCardCount(0);
+};
 
 
   const handleGoToCardPage = () => {
@@ -144,6 +151,7 @@ useEffect(() => {
   handleGoToCardPage={handleGoToCardPage}
   user={user}
   onCommissionDeducted={handleCommissionDeducted}
+  resetGameState={resetGameState}
 />
 
         </div>

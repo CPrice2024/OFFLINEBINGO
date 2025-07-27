@@ -49,6 +49,7 @@ const BingoDashboard = ({
   cardCount = 0,
   onCommissionDeducted = () => {},
   topbarRef,
+  resetGameState,
 }) => {
 
   const [isGameRunning, setIsGameRunning] = useState(false);
@@ -231,7 +232,7 @@ const deductCommission = async () => {
     }
 
     if (typeof onCommissionDeducted === "function") {
-      onCommissionDeducted(); // Optional
+      onCommissionDeducted(); 
     }
 
     console.log("✅ Commission deducted successfully:", commission);
@@ -247,12 +248,11 @@ const deductCommission = async () => {
 
 const startGame = async () => {
   if (!isGameRunning && !hasSavedSummary.current) {
-    if (!userId || commissionPercent <= 5|| cardCount <= 1 || eachCardAmount <= 9) {
+    if (!userId || commissionPercent <= 0|| cardCount <= 1 || eachCardAmount <= 5) {
       setStartMessage("⛔ ጨዋታ ለማስጀመር መጀመሪያ ደራሽ ያዘጋጁ! እንደገና ይሞክሩ።");
       return;
     }
 
-    // ✅ Get balance from Topbar via ref
     const currentBalance = topbarRef?.current?.getBalance?.();
     const totalPrizePool = cardCount * eachCardAmount;
     const commission = (commissionPercent / 100) * totalPrizePool;
@@ -264,7 +264,6 @@ const startGame = async () => {
 
     initializeGame();
 
-    // ✅ Delay isGameRunning to wait for reset
     setTimeout(() => {
       setIsGameRunning(true);
       setGameStartTrigger(prev => prev + 1);
@@ -329,7 +328,7 @@ const restartGame = () => {
   setCurrentNumber(null);
   setWinningCards([]);
   setResult('');
-  setInputCardId('');
+  resetGameState();
   hasSavedSummary.current = false
 };
 
@@ -395,8 +394,8 @@ const checkPattern = (patternName) => {
     const matchedPatterns = selectedPatterns.filter(pattern => checkPattern(pattern));
 
     const isWinner = useAndLogic
-      ? matchedPatterns.length === selectedPatterns.length // AND: all must match
-      : matchedPatterns.length > 0;                        // OR: any match
+      ? matchedPatterns.length === selectedPatterns.length
+      : matchedPatterns.length > 0;                      
 
      return { isWinner, winType: 'pattern', matchedPatterns };
 
