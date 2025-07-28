@@ -792,7 +792,7 @@ if (selectedCardIds.includes(card.id) && result?.isWinner) {
     </div>
 {isFirstFourWinner && (
   <div className="first-four-msg" style={{ marginTop: '12px', fontWeight: 'bold', color: '#1b5e20', textAlign: 'center' }}>
-    🎯 ይህ ካርቴላ በመጀመሪያ 4 ጥሪ በማሸነፉ ምክንያት ተጨማሪ የ10000 ብር ቦነስ ተሸልመዋል!!
+    🎯 ይህ ካርቴላ በመጀመሪያ 4 ጥሪ የ1000 ብር ቦነስ ተሸልመዋል!!
   </div>
 )}
 
