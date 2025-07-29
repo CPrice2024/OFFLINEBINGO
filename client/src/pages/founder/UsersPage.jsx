@@ -297,7 +297,7 @@ useEffect(() => {
         <td>{support.commission ? `${support.commission}%` : "-"}</td>
         <td>{support.city}</td>
         <td>{support.role || "agent"}</td>
-        <td>{support.superAgent?.name ?? "-"}</td>
+        <td>{support.superAgent?.name || "-"}</td>
         <td>{support.bingoCardType}</td>
         <td>{support.createdAt.slice(0, 10)}</td>
         <td style={{ position: "relative" }}>
@@ -393,12 +393,11 @@ useEffect(() => {
               <input type="text" name="phone" placeholder="Phone" value={formData.phone} onChange={handleInputChange} required />
               <input type="text" name="commission" placeholder="Commission" value={formData.commission} onChange={handleInputChange} required />
               <input type="text" name="city" placeholder="City" value={formData.city} onChange={handleInputChange} required />
-              <input type="text" name="superAgent" placeholder="Agent" list="superAgentList" value={formData.superAgent} onChange={handleInputChange} required/>
-              <datalist id="superAgentList">
-                {superAgents.map((agent) => (
-                  <option key={agent._id} value={agent.name} />
+              <input type="text" name="superAgent" placeholder="superAgent" list="superAgentList" value={formData.superAgent} onChange={handleInputChange} required/>
+              <datalist id="superAgentList"> {superAgents.map((agent) => (
+                <option key={agent._id} value={agent.name} />
                 ))}
-              </datalist>
+                </datalist>
 
               <select
               name="bingoCardType"
