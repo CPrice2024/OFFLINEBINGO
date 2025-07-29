@@ -39,8 +39,9 @@ const MainDashboardPage = () => {
   const [balance, setBalance] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [topbarKey] = useState(0);
-  const { user, userRole, userName, userId } = useContext(AuthContext);
+  const { user, userRole, userId } = useContext(AuthContext);
   const navigate = useNavigate();
+  const userName = user?.name ;
   const limit = 20;
   const cutChartData = [
   { name: "Today", value: parseFloat(cutToday.toFixed(2)) },
@@ -258,6 +259,7 @@ const computeReceiverCutData = (transactions) => {
         isCollapsed={!sidebarOpen}
         userName={userName}
         userRole={userRole}
+        userId={userId}
         sidebarOpen={sidebarOpen}
         setSidebarOpen={setSidebarOpen}
          />

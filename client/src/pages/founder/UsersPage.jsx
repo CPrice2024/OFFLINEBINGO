@@ -99,11 +99,27 @@ useEffect(() => {
     }
   };
 
-  const filteredSupports = supports.filter((f) =>
-    (f.name.toLowerCase().includes(search.toLowerCase()) ||
-      f.email.toLowerCase().includes(search.toLowerCase())) &&
-    (dateFilter ? f.createdAt.slice(0, 10) === dateFilter : true)
-  );
+ const filteredSupports = supports.filter((support) => {
+  const searchTerm = search.trim().toLowerCase();
+
+  const matchesSearch =
+    !searchTerm ||
+    [
+      support.name,
+      support.email,
+      support.phone,
+      support.superAgentName,
+      support.city,
+      support.bingoCardType,
+      support.commission?.toString(),
+    ].some((field) => field?.toLowerCase().includes(searchTerm));
+
+  const matchesDate =
+    !dateFilter || support.createdAt.slice(0, 10) === dateFilter;
+
+  return matchesSearch && matchesDate;
+});
+
   const totalPages = Math.ceil(filteredSupports.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -218,7 +234,7 @@ useEffect(() => {
           <div className="dashboard-filters">
             <input
               type="text"
-              placeholder="Search by name/email"
+              placeholder="Search by any need"
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
@@ -258,14 +274,14 @@ useEffect(() => {
                   <th><FaUser /> Name</th>
                   <th><MdEmail /> Email</th>
                   <th><MdPhone /> Phone</th>
-                  <th><FaChartLine /> Balance(Birr)</th>
-                  <th><FaRegChartBar /> Commission</th>
+                  <th><FaChartLine /> Balance</th>
+                  <th>% Commission</th>
                   <th><FaMapMarkerAlt /> City</th>
                   <th><FaUser /> Role</th>
-                  <th>Super Agent</th>
-                  <th><FaRegIdCard /> Bingo Card Type</th>
+                  <th> SuperAgent</th>
+                  <th>Cartela</th>
                   <th><AiOutlineCalendar /> Created</th>
-                  <th><FaEllipsisH /> Actions</th>
+                  <th> Actions</th>
                 </tr>
               </thead>
               <tbody>

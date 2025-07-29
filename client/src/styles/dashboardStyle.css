@@ -193,7 +193,7 @@
     color: #686868;
     cursor: pointer;
     font-size: 16px;
-    margin-top: 4px;
+    margin-top: 7px;
     max-width: 327px;
     outline: none;
     padding: 10px 14px;
@@ -512,8 +512,8 @@ mark {
 
 .modal-close {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: -8px;
+  right: 2px;
   background: transparent;
   cursor: pointer;
   margin-right: -17px;
@@ -567,7 +567,7 @@ mark {
 }
 
 .modal-submit:hover {
-  background-color: #de0000;
+  background-color: #ff0000;
 }
 /* Blur effect on the main layout */
 .dashboard-layout.blurred .dashboard-main,
