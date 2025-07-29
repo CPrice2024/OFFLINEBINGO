@@ -87,7 +87,7 @@ useEffect(() => {
     const handleLogout = async () => {
     try {
       await axios.post("/auth/logout", {}, { withCredentials: true });
-      navigate("/support/signin");
+      navigate("/signin");
     } catch (err) {
       console.error("Logout error:", err);
     }

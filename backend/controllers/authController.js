@@ -107,24 +107,15 @@ export const signupSupport = async (req, res) => {
 
     let superAgentId = null;
 
-    if (role === "agent" && superAgentName) {
-      // Try to find existing super agent
-      let superAgent = await Support.findOne({ name: superAgentName, role: "super-agent" });
+if (role === "agent" && req.body.superAgent) {
+  // Expecting frontend to send existing super agent ID
+  const superAgent = await Support.findById(req.body.superAgent);
+  if (!superAgent || superAgent.role !== "super-agent") {
+    return res.status(400).json({ message: "Invalid super agent ID" });
+  }
+  superAgentId = superAgent._id;
+}
 
-      // Create super-agent if doesn't exist
-      if (!superAgent) {
-        superAgent = await Support.create({
-          name: superAgentName,
-          email: `${Date.now()}-${Math.random()}@auto.superagent`, // dummy unique email
-          password: hashedPassword,
-          phone: "0000000000", // default dummy
-          role: "super-agent",
-          createdBy: req.user._id,
-        });
-      }
-
-      superAgentId = superAgent._id;
-    }
 
     const support = new Support({
       name,
