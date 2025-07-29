@@ -49,7 +49,7 @@ export const deleteFounder = async (req, res) => {
 export const updateSupport = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, email, phone, password, commission, city, bingoCardType  } = req.body;
+    const { name, email, phone, password, commission, city, superAgentName, bingoCardType  } = req.body;
 
     const support = await Support.findById(id);
     if (!support) return res.status(404).json({ message: "Support not found." });
@@ -65,6 +65,7 @@ export const updateSupport = async (req, res) => {
       phone,
       commission,
       city,
+      superAgentName,
       bingoCardType: bingoCardType || support.bingoCardType,
     };
 
@@ -81,8 +82,6 @@ export const updateSupport = async (req, res) => {
   }
 };
 
-
-
 // ----------- Support -----------
 export const signupSupport = async (req, res) => {
   try {
@@ -94,8 +93,8 @@ export const signupSupport = async (req, res) => {
       city,
       commission,
       bingoCardType,
-      role = "agent", // Default role
-      superAgentName, // Optional field if agent
+      role = "agent",
+      superAgentName = "", // store as plain text
     } = req.body;
 
     const existingSupport = await Support.findOne({ email });
@@ -104,18 +103,6 @@ export const signupSupport = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    let superAgentId = null;
-
-if (role === "agent" && req.body.superAgent) {
-  // Expecting frontend to send existing super agent ID
-  const superAgent = await Support.findById(req.body.superAgent);
-  if (!superAgent || superAgent.role !== "super-agent") {
-    return res.status(400).json({ message: "Invalid super agent ID" });
-  }
-  superAgentId = superAgent._id;
-}
-
 
     const support = new Support({
       name,
@@ -127,13 +114,12 @@ if (role === "agent" && req.body.superAgent) {
       bingoCardType: bingoCardType || "A100",
       createdBy: req.user._id,
       role,
-      superAgent: superAgentId,
+      superAgentName,
     });
 
     await support.save();
 
     res.status(201).json({ message: "Support registered." });
-
   } catch (error) {
     console.error("🔥 signupSupport failed:", error);
     res.status(500).json({ message: "Internal server error", error: error.message });
@@ -237,9 +223,7 @@ export const getSupportTransactions = async (req, res) => {
 
 export const getSupports = async (req, res) => {
   try {
-    const supports = await Support.find({ createdBy: req.user._id })
-    .select("-password")
-  .populate("superAgent", "name");
+    const supports = await Support.find({ createdBy: req.user._id }).select("-password");
     res.json(supports);
   } catch (error) {
     res.status(500).json({ message: "Failed to fetch supports", error: error.message });
@@ -299,9 +283,6 @@ export const getSupportCardType = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-
-
-
 
 // ----------- Credit Transfer (Properly defined) -----------
 export const transferCredit = async (req, res) => {
@@ -363,8 +344,6 @@ export const getFounderBalance = async (req, res) => {
   }
 };
 
-
-
 export const getFounderTransactions = async (req, res) => {
   try {
     const { page = 1, limit = 20, email, startDate, endDate } = req.query;
@@ -401,9 +380,6 @@ export const getFounderTransactions = async (req, res) => {
   }
 };
 
-
-
-
 // ----------- Support Profile -----------
 export const getSupportProfile = async (req, res) => {
   try {
@@ -432,7 +408,6 @@ export const getSupportProfile = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-
 
 // ----------- Notifications -----------
 export const getNotifications = async (req, res) => {

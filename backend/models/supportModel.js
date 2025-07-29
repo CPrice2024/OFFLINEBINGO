@@ -13,11 +13,7 @@ const supportSchema = new mongoose.Schema({
     enum: ["agent", "super-agent"],
     default: "agent",
   },
-  superAgent: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Support",
-    default: null,
-  },
+  superAgentName: { type: String, required:false },
   bingoCardType: {
     type: String,
     enum: ["A100", "A200", "W60", "R250"],
@@ -26,7 +22,7 @@ const supportSchema = new mongoose.Schema({
   currentToken: { type: String, default: null },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Founder", 
+    ref: "Founder",
     required: true,
   },
   createdAt: { type: Date, default: Date.now },

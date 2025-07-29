@@ -22,7 +22,6 @@ const Users = () => {
   const [topbarKey] = useState(0);
   const itemsPerPage = 10;
   const [alert, setAlert] = useState({ message: "", type: "" });
-  const [superAgents, setSuperAgents] = useState([]);
 
 
   const [formData, setFormData] = useState({
@@ -32,7 +31,7 @@ const Users = () => {
     password: "",
     commission: "",
     city: "",
-    superAgent: "",
+    superAgentName: "",
     bingoCardType: "A100",
   });
 
@@ -70,22 +69,12 @@ const Users = () => {
     }
   }, [alert]);
 
-  const fetchSuperAgents = async () => {
-  try {
-    const res = await axios.get("/auth/support/super-agents");
-    setSuperAgents(res.data);
-  } catch (error) {
-    console.error("Failed to fetch super agents:", error);
-  }
-};
-
 useEffect(() => {
   if (userRole !== "founder") {
     navigate("/main/signin");
     return;
   }
   fetchSupports();
-  fetchSuperAgents(); // 👈 ADD THIS
 }, [userRole, navigate]);
 
 
@@ -141,7 +130,7 @@ useEffect(() => {
         setAlert({ message: "Support created successfully!", type: "success" });
       }
 
-      setFormData({ name: "", email: "", phone: "", password: "", commission: "" });
+      setFormData({ name: "", email: "", phone: "", password: "", commission: "", city: "", bingoCardType: "A100", superAgentName: "" });
       setEditingSupport(null);
       setShowCreateSupport(false);
       fetchSupports();
@@ -159,7 +148,8 @@ useEffect(() => {
       password: "",
       commission: support.commission ?? "",
       city: support.city ?? "",
-      superAgent: support.superAgent || "",
+      superAgentName: support.superAgentName || "",
+
 
       bingoCardType: support.bingoCardType || "A100",
     });
@@ -248,7 +238,7 @@ useEffect(() => {
               className="create-support-button"
               onClick={() => {
                 setEditingSupport(null);
-                setFormData({ name: "", email: "", phone: "", password: "", commission: "" });
+                setFormData({ name: "", email: "", phone: "", password: "", commission: "", city: "", bingoCardType: "A100", superAgentName: "" });
                 setShowCreateSupport(true);
               }}
             >
@@ -297,7 +287,7 @@ useEffect(() => {
         <td>{support.commission ? `${support.commission}%` : "-"}</td>
         <td>{support.city}</td>
         <td>{support.role || "agent"}</td>
-        <td>{support.superAgent?.name || "-"}</td>
+        <td>{support.superAgentName || "-"}</td>
         <td>{support.bingoCardType}</td>
         <td>{support.createdAt.slice(0, 10)}</td>
         <td style={{ position: "relative" }}>
@@ -375,7 +365,7 @@ useEffect(() => {
               onClick={() => {
                 setShowCreateSupport(false);
                 setEditingSupport(null);
-                setFormData({ name: "", email: "", phone: "", password: "", commission: "", city: "", bingoCardType: "A100" });
+                setFormData({ name: "", email: "", phone: "", password: "", commission: "", city: "", bingoCardType: "A100", superAgentName: "" });
               }}
             >
               <MdClose size={20} />
@@ -393,12 +383,7 @@ useEffect(() => {
               <input type="text" name="phone" placeholder="Phone" value={formData.phone} onChange={handleInputChange} required />
               <input type="text" name="commission" placeholder="Commission" value={formData.commission} onChange={handleInputChange} required />
               <input type="text" name="city" placeholder="City" value={formData.city} onChange={handleInputChange} required />
-              <input type="text" name="superAgent" placeholder="superAgent" list="superAgentList" value={formData.superAgent} onChange={handleInputChange} required/>
-              <datalist id="superAgentList"> {superAgents.map((agent) => (
-                <option key={agent._id} value={agent.name} />
-                ))}
-                </datalist>
-
+              <input type="text" name="superAgentName" placeholder="Super Agent Name" value={formData.superAgentName} onChange={handleInputChange} />
               <select
               name="bingoCardType"
               value={formData.bingoCardType}
