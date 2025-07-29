@@ -84,7 +84,7 @@
 }
 
 .filter-bar button:hover {
-  background-color: #34495e;
+  background-color: #d10000;
 }
 
 /* Export Button */
@@ -95,7 +95,7 @@
 
 .navigation-buttons button {
   padding: 0.6rem 1rem;
-  background-color: #be0000;
+  background-color: #ad0000;
   color: white;
   border: none;
   border-radius: 8px;
@@ -107,7 +107,7 @@
 }
 
 .navigation-buttons button:hover {
-  background-color: #c0392b;
+  background-color: #e51700;
 }
 
 /* Table Styling */

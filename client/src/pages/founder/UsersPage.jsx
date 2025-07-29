@@ -307,42 +307,52 @@ useEffect(() => {
         <td>{support.bingoCardType}</td>
         <td>{support.createdAt.slice(0, 10)}</td>
         <td style={{ position: "relative" }}>
-          <button
-            onClick={() => setOpenMenuIndex(openMenuIndex === index ? null : index)}
-            className="action-dots-btn"
-          >
-            <svg stroke="#9b0000" fill="none" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="20" width="20">
-              <circle cx="12" cy="12" r="1"></circle>
-              <circle cx="12" cy="5" r="1"></circle>
-              <circle cx="12" cy="19" r="1"></circle>
-            </svg>
-          </button>
-          {openMenuIndex === index && (
-            <div
-              ref={(el) => (menuRefs.current[index] = el)}
-              className="action-dropdown"
-            >
-              <button
-                className="dropdown-item"
-                onClick={() => {
-                  handleEditSupport(support);
-                  setOpenMenuIndex(null);
-                }}
-              >
-                Edit
-              </button>
-              <button
-                className="dropdown-item"
-                onClick={() => {
-                  deleteSupport(support._id);
-                  setOpenMenuIndex(null);
-                }}
-              >
-                Delete
-              </button>
-            </div>
-          )}
-        </td>
+  <button
+    onClick={() => setOpenMenuIndex(openMenuIndex === index ? null : index)}
+    className="action-dots-btn"
+  >
+    {/* Settings icon SVG */}
+    <svg 
+      xmlns="http://www.w3.org/2000/svg" 
+      width="16" 
+      height="16" 
+      viewBox="0 0 24 24" 
+      fill="none" 
+      stroke="#4b4b4be0" 
+      strokeWidth="2" 
+      strokeLinecap="round" 
+      strokeLinejoin="round"
+    >
+      <circle cx="12" cy="12" r="3"></circle>
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+    </svg>
+  </button>
+  {openMenuIndex === index && (
+    <div
+      ref={(el) => (menuRefs.current[index] = el)}
+      className="action-dropdown"
+    >
+      <button
+        className="dropdown-item"
+        onClick={() => {
+          handleEditSupport(support);
+          setOpenMenuIndex(null);
+        }}
+      >
+        Edit
+      </button>
+      <button
+        className="dropdown-item"
+        onClick={() => {
+          deleteSupport(support._id);
+          setOpenMenuIndex(null);
+        }}
+      >
+        Delete
+      </button>
+    </div>
+  )}
+</td>
       </tr>
     ))
   ) : (

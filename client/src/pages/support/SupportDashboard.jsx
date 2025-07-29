@@ -128,8 +128,7 @@ useEffect(() => {
 
         <div className="p-4 max-w-xl mx-auto">
           <BingoDashboard
-  topbarRef={topbarRef}                 
-  userName={userName}
+  topbarRef={topbarRef}    
   userRole={userRole}
   userId={userId}
   calledNumbers={calledNumbers}

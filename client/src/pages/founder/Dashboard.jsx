@@ -175,26 +175,6 @@ const computeReceiverCutData = (transactions) => {
     fetchBalanceFromBackend();
   }, []);
 
-  const handleTransfer = async () => {
-    if (!receiverEmail || !amount || parseFloat(amount) <= 0) {
-      setStatus("❌ Please enter a valid email and amount.");
-      return;
-    }
-    try {
-      const res = await axios.post(
-        "/transfer",
-        { receiverEmail, amount: parseFloat(amount) },
-        { withCredentials: true }
-      );
-      setStatus(res.data.message);
-      setReceiverEmail("");
-      setAmount("");
-      fetchTransactions();
-      await fetchBalanceFromBackend();
-    } catch (err) {
-      setStatus(err.response?.data?.message || "Transfer failed");
-    }
-  };
 
     const handleLogout = async () => {
     try {
@@ -393,9 +373,9 @@ const computeReceiverCutData = (transactions) => {
                   <th>#</th>
                   <th>Sender</th>
                   <th>Receiver</th>
-                  <th>Credit Amount (Birr)</th>
+                  <th>Credit Amount</th>
                   <th>Commission</th>
-                  <th>Sales Amount (Birr)</th>
+                  <th>Sales Amount(Birr)</th>
                   <th>Direction</th>
                   <th>Date</th>
                 </tr>

@@ -227,7 +227,7 @@ const Topbar = forwardRef(({ isCollapsed, sidebarOpen, setSidebarOpen }, ref) =>
                 <div className="profile-image-container">
                   <img src={profileImg} alt="profile" className="profile-image" />
                 </div>
-                <div className="profile-info">{userName || "User"}</div>
+                <div className="profile-info">{userName || "Company"}</div>
                 <button className="dropdown-button" onClick={handleLogout} disabled={loggingOut}>
                   {loggingOut ? "Logging out..." : "Log Out"}
                 </button>

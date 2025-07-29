@@ -272,7 +272,7 @@ const SupportResultsPage = () => {
               <tr>
                 <th><FaIdCard /> No</th>
                 <th><FaTrophy /> Game ID</th>
-                <th><FaPercent /> Commission %</th>
+                <th><FaPercent /> Commission</th>
                 <th><FaUsers /> Players</th>
                 <th><FaMoneyBill /> Commission</th>
                 <th><FaMoneyBill /> Total Amount</th>
