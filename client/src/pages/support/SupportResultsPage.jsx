@@ -310,32 +310,6 @@ const SupportResultsPage = () => {
             </tbody>
           </table>
 
-          {filtered.length > 0 && (
-            <div className="summary-row">
-              <div className="summary-card">
-                <h4>Filtered Total Commission:</h4>
-                <p>
-                  {filtered
-                    .reduce((sum, r) => sum + (r.deductedCommission || 0), 0)
-                    .toFixed(2)} ብር
-                </p>
-              </div>
-              <div className="summary-card">
-                <h4>Filtered Total Sales:</h4>
-                <p>
-                  {filtered
-                    .reduce((sum, r) => {
-                      const totalAmount = r.commissionPercent > 0 
-                        ? r.deductedCommission / (r.commissionPercent / 100) 
-                        : 0;
-                      return sum + (totalAmount || 0);
-                    }, 0)
-                    .toFixed(2)} ብር
-                </p>
-              </div>
-            </div>
-          )}
-
           <div className="pagination-controls">
             <button
               onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}

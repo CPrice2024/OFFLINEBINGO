@@ -393,18 +393,12 @@ useEffect(() => {
               <input type="text" name="phone" placeholder="Phone" value={formData.phone} onChange={handleInputChange} required />
               <input type="text" name="commission" placeholder="Commission" value={formData.commission} onChange={handleInputChange} required />
               <input type="text" name="city" placeholder="City" value={formData.city} onChange={handleInputChange} required />
-              <input type="text" name="superAgent" placeholder="superAgent" list="superAgentList" value={formData.superAgent} onChange={handleInputChange} required/>
-               <select name="superAgent" value={formData.superAgent} onChange={handleInputChange} required>
-                <option value="">Select Super Agent</option>
+              <input type="text" name="superAgent" placeholder="Agent" list="superAgentList" value={formData.superAgent} onChange={handleInputChange} required/>
+              <datalist id="superAgentList">
                 {superAgents.map((agent) => (
-                  <option key={agent._id} value={agent._id}>
-                    {agent.name}
-                  </option>
+                  <option key={agent._id} value={agent.name} />
                 ))}
-              </select>
-
-
-
+              </datalist>
 
               <select
               name="bingoCardType"
