@@ -1092,11 +1092,11 @@ h3 {
     box-sizing: border-box;
 }
 
-.c
+
 .board-cell.flashing {
   animation: flashRandom 0.2s ease-in-out infinite alternate;
   background-color: #800000;
-  color: white;
+  color: rgb(255, 255, 255);
 }
 
 @keyframes flashRandom {

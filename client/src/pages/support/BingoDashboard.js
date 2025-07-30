@@ -446,23 +446,30 @@ const handleCheck = () => {
 };
 
 const handleMix = () => {
-  playReadySound(); // 🔊 play sound
+  playReadySound();
   console.log("✅ Mix button clicked");
 
+  let count = 0;
   const interval = setInterval(() => {
-    // pick 5 unique random numbers between 1–75
     const numbers = new Set();
     while (numbers.size < 5) {
       numbers.add(Math.floor(Math.random() * 75) + 1);
     }
-    setHighlightedNumbers(Array.from(numbers));
-  }, 150); // Change every 150ms
 
-  setTimeout(() => {
-    clearInterval(interval);
-    setHighlightedNumbers([]); // Clear after 3 seconds
-  }, 3000);
+    const selected = Array.from(numbers);
+    console.log("🔢 Flashing:", selected);
+    setHighlightedNumbers(selected);
+
+    count++;
+    if (count >= 20) {
+      clearInterval(interval);
+      setTimeout(() => {
+        setHighlightedNumbers([]);
+      }, 1000); // Hold final numbers for 1 second
+    }
+  }, 150);
 };
+
 
 
 
