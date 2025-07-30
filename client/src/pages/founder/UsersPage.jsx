@@ -218,6 +218,7 @@ useEffect(() => {
 
   return (
     <div className={`dashboard-layout ${showCreateSupport ? "blurred" : ""}`}>
+      
       <Sidebar />
       <div className="main-content">
         <TopBar
@@ -382,9 +383,13 @@ useEffect(() => {
           )}
         </div>
       </div>
+      
+      
 
       {showCreateSupport && (
+        <div class="flag-overlay">
         <div className="create-support-modal">
+          
           <div className="modal-content">
             <button
               className="modal-close"
@@ -426,10 +431,16 @@ useEffect(() => {
                 {editingSupport ? "Update" : "Create"}
               </button>
             </form>
+            
           </div>
+          
         </div>
+        </div>
+        
       )}
+      
     </div>
+    
   );
 };
 

@@ -42,7 +42,7 @@ const BingoDashboard = ({
   bingoCards = [],
   winnerAmount = 0,
   selectedCardIds = [],
-  setSelectedCardIds, // <-- Add this line
+  setSelectedCardIds, 
   userId = "",
   commissionPercent = 0,
   eachCardAmount = 0,
@@ -228,7 +228,7 @@ const deductCommission = async () => {
       amount: commission,
     });
 
-    // ✅ Refresh Topbar balance
+
     if (topbarRef?.current?.fetchBalance) {
       topbarRef.current.fetchBalance();
     }
@@ -305,7 +305,6 @@ const startGame = async () => {
 
 
 const restartGame = () => {
-  // Reset local state
   initializeGame();
   hasSavedSummary.current = false;
 
@@ -315,10 +314,9 @@ const restartGame = () => {
   setInputCardId('');
   setIsPaused(false);
 
-  // Clear parent states
   if (typeof setCalledNumbers === 'function') setCalledNumbers([]);
 
-  // Restart game
+
   setIsGameRunning(true);
 };
 
@@ -387,7 +385,6 @@ const checkPattern = (patternName) => {
 
 
 
-  // ✅ Use Topbar-selected patterns first if any
   if (
     selectedPatterns &&
     Array.isArray(selectedPatterns) &&
@@ -403,7 +400,6 @@ const checkPattern = (patternName) => {
 
   }
 
-  // ✅ Check default win conditions
   return { isWinner: checkDefaultWin(), winType: 'default' };
 };
 
@@ -441,13 +437,11 @@ useEffect(() => {
 }, [startMessage]);
 
 const handleCheck = () => {
-  playCleanSound(); // 🔊 play sound
-  console.log("✅ Check button clicked");
+  playCleanSound(); 
 };
 
 const handleMix = () => {
   playReadySound();
-  console.log("✅ Mix button clicked");
 
   let count = 0;
   const interval = setInterval(() => {
@@ -457,7 +451,6 @@ const handleMix = () => {
     }
 
     const selected = Array.from(numbers);
-    console.log("🔢 Flashing:", selected);
     setHighlightedNumbers(selected);
 
     count++;
@@ -465,7 +458,7 @@ const handleMix = () => {
       clearInterval(interval);
       setTimeout(() => {
         setHighlightedNumbers([]);
-      }, 1000); // Hold final numbers for 1 second
+      }, 1000); 
     }
   }, 150);
 };
@@ -522,7 +515,6 @@ const verifyAndShowCard = () => {
 
   setSelectedCard(card);
 
-  // ✅ Use the first 30 called numbers
   const firstFour = calledNumbers.slice(0, 30);
 
   const checkFirstThirtyWin = () => {
@@ -544,7 +536,7 @@ const verifyAndShowCard = () => {
     return horizontalWin || verticalWin || diagonal1 || diagonal2 || cornersWin;
   };
 
-  setIsFirstFourWinner(checkFirstThirtyWin()); // 💡 You can rename this to `setIsFirstThirtyWinner` if you want
+  setIsFirstFourWinner(checkFirstThirtyWin());
   setShowCardModal(true);
 };
 
@@ -817,7 +809,7 @@ BingoDashboard.propTypes = {
   bingoCards: PropTypes.array.isRequired,
   winnerAmount: PropTypes.number.isRequired,
   selectedCardIds: PropTypes.array.isRequired,
-  setSelectedCardIds: PropTypes.func.isRequired, // <-- Add this line
+  setSelectedCardIds: PropTypes.func.isRequired, 
   userId: PropTypes.string.isRequired,
   commissionPercent: PropTypes.number.isRequired,
   eachCardAmount: PropTypes.number.isRequired,

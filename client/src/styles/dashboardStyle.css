@@ -444,15 +444,15 @@ mark {
 
 .create-support-modal {
     background: rgba(161, 0, 0, .954);
-    border-radius: 8px;
+    border-radius: 19px;
     box-shadow: 0 0 15px #000000;
     left: 50%;
-    max-width: 382px;
-    padding: 2rem;
+    max-width: 355px;
+    padding: 1rem;
     position: fixed;
-    top: 50%;
+    top: 54%;
     transform: translate(-50%, -50%);
-    width: 87%;
+    width: 103%;
     z-index: 1000;
 }
 .create-support-modal h2 {
@@ -465,7 +465,7 @@ mark {
     color: #514f4f;
     border-color: #5c5c5c;
     border-style: solid;
-    margin: 8px 0;
+    margin: 6px 0;
     background-color: #fefefe;
 }
 
@@ -482,6 +482,30 @@ mark {
   font-size: 12px;
   text-align: center;
   animation: fadeIn 0.2s ease-in-out;
+}
+
+.input-icon {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 5px 10px;
+}
+
+.input-icon img {
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+}
+
+.input-icon input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  background: transparent;
 }
 
 .dashboard-alert.success {

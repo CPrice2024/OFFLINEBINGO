@@ -1102,7 +1102,7 @@ h3 {
 @keyframes flashRandom {
   from {
     background-color:#800000;
-    color: white;
+    color: rgb(188, 0, 0);
   }
   to {
     background-color: white;
