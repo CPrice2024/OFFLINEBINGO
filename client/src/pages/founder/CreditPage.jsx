@@ -170,8 +170,22 @@ const fetchBalanceFromBackend = async () => {
   };
 
 const handleTransfer = async () => {
-  if (!receiverEmail || !amount || parseFloat(amount) <= 0) {
-    setStatus("❌ Please enter a valid email and amount.");
+  const parsedAmount = parseFloat(amount);
+
+  if (
+    !receiverEmail ||
+    isNaN(parsedAmount) ||
+    parsedAmount === 0 ||
+    parsedAmount < -50000 ||
+    parsedAmount > 100000
+  ) {
+    setStatus("❌ Enter an amount between -50000 and 100000 (non-zero)");
+    return;
+  }
+
+  // Optional frontend safeguard (won't deduct balance on negative credit)
+  if (parsedAmount > 0 && parsedAmount > balance) {
+    setStatus("❌ Insufficient balance for this transfer.");
     return;
   }
 
@@ -180,19 +194,21 @@ const handleTransfer = async () => {
       "/transfer",
       {
         receiverEmail,
-        amount: parseFloat(amount),
+        amount: parsedAmount,
       },
       { withCredentials: true }
     );
-    setStatus(` ${res.data.message}`);
+
+    setStatus(`✅ ${res.data.message}`);
     setReceiverEmail("");
     setAmount("");
     fetchTransactions();
     await fetchBalanceFromBackend(); 
   } catch (err) {
-    setStatus(` ${err.response?.data?.message || "Transfer failed"}`);
+    setStatus(`❌ ${err.response?.data?.message || "Transfer failed"}`);
   }
 };
+
 
 
   const totalPages = Math.ceil(total / limit);
@@ -264,7 +280,7 @@ const handleTransfer = async () => {
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
           placeholder="Amount"
-          min="100"
+          min="-50000"
           max="100000"
           required
         />
@@ -273,7 +289,14 @@ const handleTransfer = async () => {
       <button
         className="send-button"
         onClick={handleTransfer}
-        disabled={!receiverEmail || !amount || parseFloat(amount) <= 0}
+        disabled={
+  !receiverEmail ||
+  isNaN(parseFloat(amount)) ||
+  parseFloat(amount) === 0 ||
+  parseFloat(amount) < -50000 ||
+  parseFloat(amount) > 100000
+}
+
       >
         Transfer
       </button>

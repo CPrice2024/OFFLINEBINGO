@@ -1,18 +1,21 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client';  // React 18 and above
-// Global styles for the app
-import { BrowserRouter } from 'react-router-dom';  // For routing
-import { AuthProvider } from './context/AuthContext';  // Authentication Context
-import AppRoutes from './routes/AppRoutes';  // Routes for different pages
+import ReactDOM from 'react-dom/client';
 
-// Creating the root element for React 18 and above
+import { BrowserRouter } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import AppRoutes from './routes/AppRoutes';
+import { initDB } from './utils/indexedDB'; 
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
-// Rendering the app wrapped with BrowserRouter and AuthProvider
-root.render(
-  <AuthProvider>  {/* Wrap the app with Auth context */}
-    <BrowserRouter>  {/* BrowserRouter for routing */}
-      <AppRoutes />  {/* Your routes */}
-    </BrowserRouter>
-  </AuthProvider>
-);
+(async () => {
+  await initDB();
+
+  root.render(
+    <AuthProvider>
+      <BrowserRouter>
+        <AppRoutes />
+      </BrowserRouter>
+    </AuthProvider>
+  );
+})();

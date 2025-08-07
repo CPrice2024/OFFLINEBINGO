@@ -22,6 +22,11 @@ import {
   markNotificationAsRead,
   deductCommission,
   getSuperAgents,
+  syncBalance,
+  getSupportBalance,
+  syncOfflineCommissions,
+  syncOfflineSummaries,
+  resetSupportBalance
 } from "../controllers/authController.js";
 
 import { protect } from "../middleware/authMiddleware.js";
@@ -39,8 +44,6 @@ router.get("/transaction", protect("founder"), getFounderTransactions);
 router.get("/founder/notifications", protect("founder"), getNotifications);
 router.post("/transaction", protect("founder"), transferCredit);
 router.post("/support/deduct", protect("support"), deductCommission);
-
-
 // ---------- Support Routes ----------
 router.post("/support/signup", protect("founder"), signupSupport);
 
@@ -52,14 +55,14 @@ router.get("/support/profile", protect("support"), getSupportProfile);
 router.get("/support/transactions", protect("support"), getSupportTransactions);
 router.get("/support/notifications", protect("support"), getNotifications);
 router.patch("/support/notifications/:id", protect("support"), markNotificationAsRead);
-router.post("/support/deduct", protect("support"), deductCommission);
 router.get("/support/:id/card-type", protect("support"), getSupportCardType);
 router.get("/support/:id", protect("support"), getSupportById);
 router.get('/support/super-agents', protect("founder"), getSuperAgents);
-
-
-
-
+router.post('/support/sync-balance', protect("support"), syncBalance);
+router.get("/support/balance", protect("support"), getSupportBalance);
+router.post("/sync/commissions", protect("support"), syncOfflineCommissions);
+router.post("/sync/game-summaries", protect("support"), syncOfflineSummaries);
+router.post("/support/reset-balance", protect("support"), resetSupportBalance);
 
 // ---------- Common ----------
 router.post("/logout", logout);

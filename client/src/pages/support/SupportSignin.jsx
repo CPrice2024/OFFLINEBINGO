@@ -3,6 +3,11 @@ import axios from "../../api/axios";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import "../../styles/signStyle.css";
+import { openDB } from 'idb';
+import { saveSupportCredentials,
+   getSupportCredentials,
+   
+   } from "../../utils/indexedDB";
 
 const SupportSignin = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -24,6 +29,7 @@ const SupportSignin = () => {
     const timer = setTimeout(() => setPageLoading(false), 1000);
     return () => clearTimeout(timer);
   }, []);
+
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
   };
@@ -34,38 +40,72 @@ const SupportSignin = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
+  e.preventDefault();
+  setIsLoading(true);
+  setError("");
 
-    try {
-      let { email, password } = formData;
-      let redirectToSales = false;
+  try {
+    let { email: rawEmail, password } = formData;
+    let email = rawEmail;
+    let redirectToSales = false;
 
-      if (email.endsWith(".sales")) {
-        email = email.replace(".sales", "");
-        redirectToSales = true;
-      }
+    if (email.endsWith(".sales")) {
+      email = email.replace(".sales", "");
+      redirectToSales = true;
+    }
 
-      const res = await axios.post(
-        "/auth/support/signin",
-        { email, password },
-        { withCredentials: true }
-      );
+    const res = await axios.post(
+      "/auth/support/signin",
+      { email, password },
+      { withCredentials: true }
+    );
+
+    console.log("🧾 Login response:", res.data);
+
+    const { name, _id, email: returnedEmail } = res.data;
+
+    // AuthContext setup
+    setUserRole("support");
+    setUserId(_id);
+    setUserName(name);
+    setUserEmail(returnedEmail);
+
+    // Cache user for offline access
+    if (!returnedEmail || !_id) {
+      console.error("❌ Cannot cache user: missing email or _id", res.data);
+    } else {
+      await saveSupportCredentials({
+        _id: String(_id),
+        email,
+        name,
+        password,
+      });
+      console.log("✅ Cached user offline:", returnedEmail);
+    }
+
+    navigate(redirectToSales ? "/sales" : "/Agent/dashboard");
+  } catch (err) {
+    console.warn("⚠️ Online login failed, checking offline...", err.message);
+
+    const fallbackEmail = formData.email.replace(".sales", "");
+    const cachedUser = await getSupportCredentials(fallbackEmail);
+
+    if (cachedUser && cachedUser.password === formData.password) {
+      console.log("📦 Logged in offline as:", cachedUser.email);
 
       setUserRole("support");
-      setUserId(res.data._id);
-      setUserName(res.data.name);
-      setUserEmail(res.data.email);
-
-      navigate(redirectToSales ? "/sales" : "/Agent/dashboard");
-    } catch (err) {
-      console.error("Signin failed:", err);
+      setUserId(cachedUser._id);
+      setUserName(cachedUser.name);
+      setUserEmail(cachedUser.email);
+      navigate("/Agent/dashboard");
+    } else {
       const msg = err.response?.data?.message || "Sign-in failed. Please try again.";
       setError(msg);
-    } finally {
-      setIsLoading(false);
     }
-  };
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   if (pageLoading) {
     return (

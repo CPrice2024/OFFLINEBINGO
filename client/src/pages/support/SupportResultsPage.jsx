@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
+import { getAllGameSummaries } from "../../utils/indexedDB";
 import axios from "../../api/axios";
 import "../../styles/supportResultsStyle.css";
 import dailyIcon from "../../assets/daily.png";
@@ -43,21 +44,46 @@ const SupportResultsPage = () => {
   const { user, userRole, userId } = useContext(AuthContext);
   const userName = user?.name;
 
-  useEffect(() => {
-    const fetchResults = async () => {
-      try {
+useEffect(() => {
+  const fetchResults = async () => {
+    try {
+      if (navigator.onLine) {
+        // 🌐 Online: get data from MongoDB
         const res = await axios.get("/game-results/support-results", {
           withCredentials: true,
         });
         setResults(res.data);
         setFiltered(res.data);
         computeStats(res.data);
-      } catch (err) {
-        console.error("Error fetching game results:", err);
+      } else {
+        // 📴 Offline: get data from IDB
+        const offlineData = await getAllGameSummaries(); 
+        if (offlineData.length > 0) {
+          // Normalize to match structure used in computeStats
+          const normalized = offlineData.map((item, i) => ({
+            _id: `offline-${i}`,
+            commissions: ((item.eachCardAmount || 0) * (item.cardCount || 0) * (item.commissionPercent || 0)) / 100,
+            commissionPercent: item.commissionPercent || 0,
+            cardCount: item.cardCount || 0,
+            cardAmount: item.eachCardAmount || 0,
+            createdAt: item.createdAt || new Date().toISOString(),
+          }));
+          setResults(normalized);
+          setFiltered(normalized);
+          computeStats(normalized);
+        } else {
+          setResults([]);
+          setFiltered([]);
+        }
       }
-    };
-    fetchResults();
-  }, []);
+    } catch (err) {
+      console.error("Error fetching game results:", err);
+    }
+  };
+
+  fetchResults();
+}, []);
+
 
   const computeStats = (data) => {
     const now = new Date();
@@ -74,21 +100,21 @@ const SupportResultsPage = () => {
     const startOfYear = new Date(now.getFullYear(), 0, 1);
 
     // Calculate commission stats
-    const total = data.reduce((sum, r) => sum + (r.deductedCommission || 0), 0);
+    const total = data.reduce((sum, r) => sum + (r.commissions || 0), 0);
     const daily = data
       .filter((r) => new Date(r.createdAt) >= startOfDay)
-      .reduce((sum, r) => sum + (r.deductedCommission || 0), 0);
+      .reduce((sum, r) => sum + (r.commissions || 0), 0);
     const weekly = data
       .filter((r) => new Date(r.createdAt) >= startOfWeek)
-      .reduce((sum, r) => sum + (r.deductedCommission || 0), 0);
+      .reduce((sum, r) => sum + (r.commissions || 0), 0);
     const yearly = data
       .filter((r) => new Date(r.createdAt) >= startOfYear)
-      .reduce((sum, r) => sum + (r.deductedCommission || 0), 0);
+      .reduce((sum, r) => sum + (r.commissions || 0), 0);
 
     // Calculate total amount stats (before commission)
     const grandTotal = data.reduce((sum, r) => {
       const totalAmount = r.commissionPercent > 0 
-        ? r.deductedCommission / (r.commissionPercent / 100) 
+        ? r.commissions / (r.commissionPercent / 100) 
         : 0;
       return sum + (totalAmount || 0);
     }, 0);
@@ -97,7 +123,7 @@ const SupportResultsPage = () => {
       .filter((r) => new Date(r.createdAt) >= startOfDay)
       .reduce((sum, r) => {
         const totalAmount = r.commissionPercent > 0 
-          ? r.deductedCommission / (r.commissionPercent / 100) 
+          ? r.commissions / (r.commissionPercent / 100) 
           : 0;
         return sum + (totalAmount || 0);
       }, 0);
@@ -106,7 +132,7 @@ const SupportResultsPage = () => {
       .filter((r) => new Date(r.createdAt) >= startOfWeek)
       .reduce((sum, r) => {
         const totalAmount = r.commissionPercent > 0 
-          ? r.deductedCommission / (r.commissionPercent / 100) 
+          ? r.commissions / (r.commissionPercent / 100) 
           : 0;
         return sum + (totalAmount || 0);
       }, 0);
@@ -114,8 +140,8 @@ const SupportResultsPage = () => {
     const yearlyTotal = data
       .filter((r) => new Date(r.createdAt) >= startOfYear)
       .reduce((sum, r) => {
-        const totalAmount = r.commissionPercent > 0 
-          ? r.deductedCommission / (r.commissionPercent / 100) 
+        const totalAmount = (r.commissions / r.commissionPercent )
+          ? r.commissions / (r.commissionPercent / 100) 
           : 0;
         return sum + (totalAmount || 0);
       }, 0);
@@ -274,15 +300,15 @@ const SupportResultsPage = () => {
                 <th><FaTrophy /> Game ID</th>
                 <th><FaPercent /> Commission</th>
                 <th><FaUsers /> Players</th>
-                <th><FaMoneyBill /> Commission</th>
+                <th><FaMoneyBill /> sales</th>
                 <th><FaMoneyBill /> Total Amount</th>
                 <th><FaClock /> Time</th>
               </tr>
             </thead>
             <tbody>
               {paginatedResults.map((r, index) => {
-                const totalAmount = r.commissionPercent > 0 
-                  ? (r.deductedCommission / (r.commissionPercent / 100)).toFixed(2)
+                const totalAmount = (r.cardCount)
+                  ? (r.commissions / (r.commissionPercent / 100)).toFixed(2)
                   : "0.00";
                 
                 return (
@@ -291,7 +317,7 @@ const SupportResultsPage = () => {
                     <td>{r._id}</td>
                     <td className="icon-style">{r.commissionPercent}%</td>
                     <td className="icon-style">{r.cardCount}</td>
-                    <td className="icon-style">{r.deductedCommission?.toFixed(2)}</td>
+                    <td className="icon-style">{r.commissions?.toFixed(2)}</td>
                     <td className="icon-style">{totalAmount}</td>
                     <td className="icon-style">
                       {r.createdAt

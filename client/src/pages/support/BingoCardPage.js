@@ -5,7 +5,7 @@ import Topbar from "../../components/TopBar";
 import { FiRefreshCcw } from "react-icons/fi";
 import axios from "../../api/axios";
 import Sidebar from "../../components/Sidebar";
-import { FaMoneyBillWave, FaEraser, FaSearch, FaGamepad } from "react-icons/fa";
+import { FaSearch, FaGamepad } from "react-icons/fa";
 import { useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 
@@ -16,8 +16,6 @@ function BingoCardPage({
   setWinnerAmount,
   selectedCardIds = [],
   setSelectedCardIds,
-  commissionPercent,
-  setCommissionPercent,
   eachCardAmount,
   setEachCardAmount,
   cardCount,
@@ -28,6 +26,7 @@ function BingoCardPage({
   const [searchCardId, setSearchCardId] = useState('');
   const [foundCard, setFoundCard] = useState(null);
   const [loading, setLoading] = useState(true);
+  
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -35,41 +34,47 @@ function BingoCardPage({
   const { userId, userRole, userName } = useContext(AuthContext);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const { winningCardIds = [], calledNumbers = [] } = location.state || {};
+  const [commissionPercent, setCommissionPercent] = useState(20);
 
-  // Load bingo cards based on support's bingoCardType
-  useEffect(() => {
-    const loadBingoCard = async () => {
-      try {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/auth/support/profile`, { withCredentials: true });
-
-        console.log("Support profile response:", res.data);
-
-        const bingoCardType = res.data.bingoCardType || "default";
-
-        // Try loading the file
-        console.log("Fetching bingo cards for type:", bingoCardType);
-        let cardRes = await fetch(`/bingoCards/bingoCards.${bingoCardType}.json`);
-        if (!cardRes.ok) {
-          console.warn(`Card file for type "${bingoCardType}" not found. Falling back to default.`);
-          cardRes = await fetch(`/bingoCards/bingoCards.default.json`);
-          console.log("Support profile response:", res.data);
-        }
-
-        const text = await cardRes.text();
-        const json = JSON.parse(text); // Safe parse (will throw if invalid)
-        setBingoCards(json.cards || json);
-      } catch (err) {
-        console.error("Failed to load cards:", err);
-        setBingoCards([]);
-      } finally {
+  // Load bingo cards
+useEffect(() => {
+  const loadBingoCard = async () => {
+    try {
+      const cached = localStorage.getItem("bingoCards");
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        setBingoCards(parsed);
         setLoading(false);
+        return;
       }
-    };
 
-    if (userRole === "support") {
-      loadBingoCard();
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/auth/support/profile`, { withCredentials: true });
+      const bingoCardType = res.data.bingoCardType || "default";
+
+      let cardRes = await fetch(`/bingoCards/bingoCards.${bingoCardType}.json`);
+      if (!cardRes.ok) {
+        console.warn(`Card file for type "${bingoCardType}" not found. Falling back to default.`);
+        cardRes = await fetch(`/bingoCards/bingoCards.default.json`);
+      }
+
+      const json = await cardRes.json();
+      const cards = json.cards || json;
+
+      setBingoCards(cards);
+      localStorage.setItem("bingoCards", JSON.stringify(cards));
+    } catch (err) {
+      console.error("Failed to load cards:", err);
+      setBingoCards([]);
+    } finally {
+      setLoading(false);
     }
-  }, [userRole, setBingoCards]);
+  };
+
+  if (userRole === "support") {
+    loadBingoCard();
+  }
+}, [userRole, setBingoCards]);
+
 
   useEffect(() => {
     if (startMessage) {
@@ -80,37 +85,6 @@ function BingoCardPage({
     }
   }, [startMessage]);
 
-  const handleSetWinnerAmount = () => {
-    const cardAmount = parseFloat(winnerAmountInput);
-    if (isNaN(cardAmount) || cardAmount < 10) {
-      setStartMessage('⛔ እባክዎ ከ 10 ብር በላይ ያለ የካርቴላ ዋጋ ያስገቡ።');
-      return;
-    }
-
-    const count = selectedCardIds.length;
-    if (count === 0) {
-      setStartMessage('እባክዎ ካርቴላ ይምረጡ።');
-      return;
-    }
-
-    const total = count * cardAmount;
-    const commission = (commissionPercent / 100) * total;
-    const finalAmount = total - commission;
-
-    setWinnerAmount(Math.round(finalAmount));
-    setIsWinnerAmountSet(true);
-    setEachCardAmount(cardAmount);
-    setCardCount(count);
-    setWinnerAmountInput('');
-  };
-
-  const handleClearWinnerAmount = () => {
-    setWinnerAmount(0);
-    setIsWinnerAmountSet(false);
-    setEachCardAmount(eachCardAmount);
-    setCardCount(selectedCardIds.length);
-  };
-
   const handleSelectCard = (cardId) => {
     const updated = selectedCardIds.includes(cardId)
       ? selectedCardIds.filter((id) => id !== cardId)
@@ -119,16 +93,33 @@ function BingoCardPage({
   };
 
   const handleNavigateToGame = () => {
+    const cardAmount = parseFloat(winnerAmountInput);
+    const count = selectedCardIds.length;
+
+    const total = count * cardAmount;
+    const commission = (commissionPercent / 100) * total;
+    const finalAmount = total - commission;
+
+    setWinnerAmount(Math.round(finalAmount));
+    setEachCardAmount(cardAmount);
+    setCardCount(count);
+    setIsWinnerAmountSet(true);
+
     navigate("/Agent/dashboard", {
       state: {
         calledNumbers,
         winningCardIds,
         commissionPercent,
-        eachCardAmount,
-        cardCount,
+        eachCardAmount: cardAmount,
+        cardCount: count,
       }
     });
   };
+
+  useEffect(() => {
+  setCommissionPercent(20); 
+}, []);
+  
 
   const handleFindCard = () => {
     const cardId = parseInt(searchCardId);
@@ -155,7 +146,11 @@ function BingoCardPage({
     setSelectedCardIds([]);
     setFoundCard(null);
     setSearchCardId('');
-  };
+
+    navigate("/Agent/dashboard", {
+
+  });
+};
 
   const handleLogout = async () => {
     try {
@@ -201,50 +196,37 @@ function BingoCardPage({
         <div className="bingo-card-pagee">
           {/* Winner amount input */}
           <div className="winner-winner">
-            {!isWinnerAmountSet ? (
-              <div className="input-group">
-                <input
-                  type="number"
-                  value={winnerAmountInput}
-                  onChange={(e) => setWinnerAmountInput(e.target.value)}
-                  placeholder="amount"
-                  min="10"
-                  className="winner-amount-input"
-                />
-                <select
-                  className="select-commission"
-                  value={commissionPercent}
-                  onChange={(e) => setCommissionPercent(Number(e.target.value))}
-                >
-                  <option value={5}>1</option>
-                  <option value={10}>2</option>
-                  <option value={15}>3</option>
-                  <option value={20}>4</option>
-                  <option value={25}>5</option>
-                  <option value={30}>6</option>
-                  <option value={35}>7</option>
-                  <option value={40}>8</option>
-                </select>
-                <button className='new_card_button' onClick={handleSetWinnerAmount}>
-                  <FaMoneyBillWave style={{ marginRight: '8px' }} /> Amount
-                </button>
-              </div>
-            ) : (
-              <div className="winner-amount-display">
-                <h2>winner amount {winnerAmount} Birr</h2>
-                <div className="winner-actions">
-                  <button onClick={handleClearWinnerAmount} className="new_card_button">
-                    <FaEraser style={{ marginRight: '8px' }} /> Clear Amount
-                  </button>
-                </div>
-              </div>
-            )}
+            <div className="input-group">
+              <input
+                type="number"
+                value={winnerAmountInput}
+                onChange={(e) => setWinnerAmountInput(e.target.value)}
+                placeholder="amount"
+                min="10"
+                className="winner-amount-input"
+              />
+              <select
+                className="select-commission"
+                value={commissionPercent}
+                onChange={(e) => setCommissionPercent(Number(e.target.value))}
+              >
+                <option value={20}>1</option>
+                <option value={25}>2</option>
+                <option value={30}>3</option>
+                <option value={35}>4</option>
+                <option value={40}>5</option>
+                <option value={45}>6</option>
+                <option value={50}>7</option>
+              </select>
+            </div>
           </div>
+
           {startMessage && (
             <div className="signin-error">
               {startMessage}
             </div>
           )}
+
           {/* Actions */}
           <div className="action-buttons">
             <div className="find-card-input">
@@ -268,11 +250,13 @@ function BingoCardPage({
               <FaGamepad style={{ marginRight: '8px' }} /> Save
             </button>
           </div>
+
           {foundCard && (
             <div className="found-card">
               {renderCard(foundCard)}
             </div>
           )}
+
           {selectedCardIds.length > 0 && (
             <div className="selected-cards">
               <h3>Selected cartela</h3>
@@ -289,6 +273,7 @@ function BingoCardPage({
               </div>
             </div>
           )}
+
           {loading ? (
             <div className="loading">loading cartela...</div>
           ) : (

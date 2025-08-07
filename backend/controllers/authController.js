@@ -10,7 +10,7 @@ const cookieOptions = {
   secure: process.env.NODE_ENV === "production",
   sameSite: "none",
   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-};
+}; 
 
 // ----------- Founder -----------
 export const signupFounder = async (req, res) => {
@@ -94,7 +94,7 @@ export const signupSupport = async (req, res) => {
       commission,
       bingoCardType,
       role = "agent",
-      superAgentName = "", // store as plain text
+      superAgentName = "", 
     } = req.body;
 
     const existingSupport = await Support.findOne({ email });
@@ -154,7 +154,6 @@ export const getSupportById = async (req, res) => {
 };
 
 
-
 export const signinSupport = async (req, res) => {
   const { email, password } = req.body;
 
@@ -166,12 +165,61 @@ export const signinSupport = async (req, res) => {
   const token = generateToken(support, "support");
   res.cookie("token", token, cookieOptions);
 
+  const { name, _id, email: supportEmail } = support;
+
+  console.log("✅ Support object:", { name, _id, email: supportEmail });
+
   res.status(200).json({
     message: "Support logged in successfully.",
-    name: support.name,
-    _id: support._id,
+    name,
+    _id,
+    email, // ✅ THIS MUST BE PRESENT!
   });
 };
+export const resetSupportBalance = async (req, res) => {
+  const { userId } = req.body;
+
+  if (!userId) {
+    return res.status(400).json({ message: "User ID is required" });
+  }
+
+  try {
+    const support = await Support.findById(userId);
+    if (!support) {
+      return res.status(404).json({ message: "Support user not found" });
+    }
+
+    support.balance = 0;
+    await support.save();
+
+    res.status(200).json({ message: "Balance reset to 0" });
+  } catch (error) {
+    console.error("❌ Error resetting balance:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const syncBalance = async (req, res) => {
+  try {
+    const { balance } = req.body;
+    const userId = req.user._id;
+
+    const support = await Support.findById(userId);
+    if (!support) {
+      return res.status(404).json({ message: "Support user not found" });
+    }
+
+    support.balance = balance;
+    await support.save();
+
+    res.status(200).json({ message: "Balance synced successfully", balance });
+  } catch (error) {
+    console.error("❌ syncBalance error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
 // controllers/transferController.js
 export const markNotificationAsRead = async (req, res) => {
   try {
@@ -288,41 +336,49 @@ export const getSupportCardType = async (req, res) => {
 export const transferCredit = async (req, res) => {
   try {
     const { receiverEmail, amount } = req.body;
+    const parsedAmount = Number(amount);
+
+    if (!receiverEmail || isNaN(parsedAmount) || parsedAmount === 0) {
+      return res.status(400).json({ message: "Invalid email or amount" });
+    }
+
     const founder = await Founder.findById(req.user._id);
     const support = await Support.findOne({ email: receiverEmail });
 
     if (!founder) return res.status(404).json({ message: "Founder not found" });
     if (!support) return res.status(404).json({ message: "Support not found" });
 
-    if (founder.balance < amount) {
-      return res.status(400).json({ message: "Insufficient balance" });
+    // 💡 If amount is positive, check and deduct founder balance
+    if (parsedAmount > 0) {
+      if (founder.balance < parsedAmount) {
+        return res.status(400).json({ message: "Insufficient balance" });
+      }
+
+      founder.balance -= parsedAmount;
+      await founder.save();
+      console.log("✅ Founder balance deducted:", founder.balance);
     }
 
-    // Decrease founder balance
-    founder.balance -= Number(amount);
-    await founder.save();
-    console.log("✅ Founder balance updated:", founder.balance);
-
-    // Increase support balance using atomic update
+    // ✅ Always update support balance
     await Support.updateOne(
       { _id: support._id },
-      { $inc: { balance: Number(amount) } }
+      { $inc: { balance: parsedAmount } }
     );
     console.log("✅ Support balance updated with $inc");
 
-    // Create transaction record
+    // ✅ Record transaction
     const transaction = await Transaction.create({
       senderId: founder._id,
       receiverId: support._id,
       senderEmail: founder.email,
       receiverEmail: support.email,
-      amount,
+      amount: parsedAmount,
     });
 
     console.log("✅ Transaction recorded");
 
     res.status(200).json({
-      message: `Transferred ${amount} birr to ${receiverEmail}`,
+      message: `Transferred ${parsedAmount} birr to ${receiverEmail}`,
       transaction,
     });
   } catch (error) {
@@ -330,6 +386,7 @@ export const transferCredit = async (req, res) => {
     res.status(500).json({ message: "Internal server error", error: error.message });
   }
 };
+
 export const getFounderBalance = async (req, res) => {
   try {
     const founder = await Founder.findById(req.user._id);
@@ -380,6 +437,7 @@ export const getFounderTransactions = async (req, res) => {
   }
 };
 
+
 // ----------- Support Profile -----------
 export const getSupportProfile = async (req, res) => {
   try {
@@ -408,6 +466,45 @@ export const getSupportProfile = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+export const getSupportBalance = async (req, res) => {
+  try {
+    const support = await Support.findById(req.user._id);
+    if (!support) {
+      return res.status(404).json({ message: "Support user not found" });
+    }
+    res.status(200).json({ balance: support.balance });
+  } catch (error) {
+    console.error("getSupportBalance error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+export const syncOfflineCommissions = async (req, res) => {
+  try {
+    const { commissions } = req.body;
+    // Save them however you need: DB insert, summary, etc.
+    console.log("✅ Synced commissions:", commissions.length);
+    res.status(200).json({ message: "Commissions synced" });
+  } catch (err) {
+    console.error("Sync commissions failed:", err);
+    res.status(500).json({ message: "Error syncing commissions" });
+  }
+};
+
+export const syncOfflineSummaries = async (req, res) => {
+  try {
+    const { summaries } = req.body;
+    // Save summaries
+    console.log("✅ Synced summaries:", summaries.length);
+    res.status(200).json({ message: "Game summaries synced" });
+  } catch (err) {
+    console.error("Sync summaries failed:", err);
+    res.status(500).json({ message: "Error syncing summaries" });
+  }
+};
+
 
 // ----------- Notifications -----------
 export const getNotifications = async (req, res) => {

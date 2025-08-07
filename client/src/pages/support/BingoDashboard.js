@@ -9,6 +9,7 @@ import bingoBall3 from '../../assets/bingo-ball-3.png';
 import bingoBall4 from '../../assets/bingo-ball-4.png';
 import bingoBall5 from '../../assets/bingo-ball-5.png';
 import { getPatternCells } from '../../utils/patternUtils';
+import { db } from "../../utils/dexieDB";
 
 
 import {
@@ -25,6 +26,7 @@ import { MdPlayArrow, MdRestartAlt, MdPause } from 'react-icons/md';
 import { MdGridView } from "react-icons/md";
 import { FaCheck, FaEye } from "react-icons/fa";
 import { MdCleaningServices } from 'react-icons/md';
+import { openDB } from 'idb';
 import '../../styles/showCardDetails.css';
 import { useNavigate  } from "react-router-dom";
 
@@ -76,7 +78,6 @@ const BingoDashboard = ({
   const navigate = useNavigate();
   const [isFirstFourWinner, setIsFirstFourWinner] = useState(false);
 
-
 const playCallSound = useCallSound();
 const playPauseSound = usePauseSound();
 const playReadySound = useReadySound();
@@ -122,6 +123,33 @@ const [highlighted, setHighlighted] = useState([]);
     return () => clearInterval(interval);
   }, [patternIndex]);
 
+useEffect(() => {
+  const syncOfflineSummaries = async () => {
+    try {
+      const unsynced = await db.offlineSummaries
+        .where("isSynced")
+        .equals(false)
+        .toArray();
+
+      for (const summary of unsynced) {
+        try {
+          await axios.post("/game-results/save-summary", summary, { withCredentials: true });
+          await db.offlineSummaries.update(summary.id, { isSynced: true });
+          console.log("✅ Synced summary:", summary.id);
+        } catch (err) {
+          console.warn("❌ Failed to sync summary:", err.message);
+        }
+      }
+    } catch (err) {
+      console.error("❌ Error reading from Dexie:", err.message);
+    }
+  };
+
+  window.addEventListener("online", syncOfflineSummaries);
+  return () => window.removeEventListener("online", syncOfflineSummaries);
+}, []);
+
+
   const initializeGame = useCallback(() => {
     const seed = Date.now().toString();
     rngRef.current = seedrandom(seed);
@@ -136,8 +164,6 @@ const [highlighted, setHighlighted] = useState([]);
   if (winningCards.length === 0) return winnerAmount;
   return winnerAmount;
 };
-
-
   const callNumber = useCallback(() => {
   if (!isGameRunning || isPaused) return;
 
@@ -146,8 +172,6 @@ const [highlighted, setHighlighted] = useState([]);
   setCurrentNumber(null); 
   return;
 }
-
-
   let randomNumber;
   do {
     randomNumber = Math.floor(rngRef.current() * 75) + 1;
@@ -184,6 +208,21 @@ const saveSummaryToBackend = async (winningCardIds) => {
     setStartMessage("⛔ ውጤት ማስቀመጥ አልተቻለም።");
   }
 };
+useEffect(() => {
+  const syncIfOnline = () => {
+    if (navigator.onLine && topbarRef.current?.fetchBalance) {
+      topbarRef.current.fetchBalance();
+    }
+  };
+
+  window.addEventListener("online", syncIfOnline);
+
+  // run once on mount
+  syncIfOnline();
+
+  return () => window.removeEventListener("online", syncIfOnline);
+}, []);
+
 
   useEffect(() => {
     let interval;
@@ -208,49 +247,51 @@ const closeCardModal = () => {
   setSelectedCard(null);
 };
 
+const saveOfflineSummary = (payload) => {
+  const summaries = JSON.parse(localStorage.getItem("offline_summaries") || "[]");
+  summaries.push(payload);
+  localStorage.setItem("offline_summaries", JSON.stringify(summaries));
+};
+
 const deductCommission = async () => {
   const totalPrizePool = cardCount * eachCardAmount;
   const commission = (commissionPercent / 100) * totalPrizePool;
 
-  if (!userId || commission <= 0) {
-    console.warn("❌ Invalid commission deduction input", { userId, commission });
-    return false;
-  }
+  if (!userId || commission <= 0) return false;
+
+  const summaryPayload = {
+    cardCount,
+    commissionPercent,
+    calledNumbers: [],
+    winningCardIds: [],
+    userId,
+    eachCardAmount,
+    initial: true,
+  };
 
   try {
-    console.log("📤 Sending commission deduction payload:", {
-      userId,
-      amount: commission,
-    });
+    const success = await topbarRef?.current?.applyCommission?.(commission, summaryPayload);
 
-    await axios.post("/auth/support/deduct", {
-      userId,
-      amount: commission,
-    });
-
-
-    if (topbarRef?.current?.fetchBalance) {
-      topbarRef.current.fetchBalance();
+    if (!success) {
+      const balance = topbarRef?.current?.getBalance?.() || 0;
+      setStartMessage(`⛔ ኮሚሽን መቀነስ አልተቻለም። ቀሪ ሂሳብ: ${balance.toFixed(1)} ብር`);
+      return false;
     }
 
-    if (typeof onCommissionDeducted === "function") {
-      onCommissionDeducted(); 
-    }
-
-    console.log("✅ Commission deducted successfully:", commission);
     return true;
-
-  } catch (error) {
-    const message = error?.response?.data?.message || error.message;
-    console.error("❌ Commission deduction failed:", message);
-    setStartMessage(`⛔ ኮሚሽኑን መቀነስ አልተቻለም። ${message}`);
+  } catch (err) {
+    const msg = err?.response?.data?.message || err.message;
+    console.error("❌ deductCommission error:", msg);
+    setStartMessage(`⛔ ኮሚሽን መቀነስ አልተቻለም። ${msg}`);
     return false;
   }
 };
 
+
+
 const startGame = async () => {
   if (!isGameRunning && !hasSavedSummary.current) {
-    if (!userId || commissionPercent <= 0|| cardCount <= 1 || eachCardAmount <= 5) {
+    if (!userId || commissionPercent <= 0 || cardCount <= 1 || eachCardAmount <= 5) {
       setStartMessage("⛔ ጨዋታ ለማስጀመር መጀመሪያ ደራሽ ያዘጋጁ! እንደገና ይሞክሩ።");
       return;
     }
@@ -264,44 +305,44 @@ const startGame = async () => {
       return;
     }
 
-    initializeGame();
-
-    setTimeout(() => {
-      setIsGameRunning(true);
-      setGameStartTrigger(prev => prev + 1);
-    }, 50);
-
-    hasSavedSummary.current = true;
+    const summaryPayload = {
+      cardCount,
+      commissionPercent,
+      calledNumbers: [],
+      winningCardIds: [],
+      userId,
+      eachCardAmount,
+      initial: true,
+    };
 
     try {
-      const success = await deductCommission();
+      const success = await topbarRef?.current?.applyCommission?.(commission, summaryPayload);
+
       if (!success) {
         setStartMessage("⛔ ኮሚሽን መቀነስ አልተቻለም። ጨዋታ አልተጀመረም።");
         setIsGameRunning(false);
         return;
       }
 
-      const payload = {
-        cardCount,
-        commissionPercent,
-        calledNumbers: [],
-        winningCardIds: [],
-        userId,
-        eachCardAmount,
-        initial: true,
-      };
+      // ✅ Commission deducted successfully
+      hasSavedSummary.current = true;
+      initializeGame(); // Now safe to start
+      setTimeout(() => {
+        setIsGameRunning(true);
+        setGameStartTrigger(prev => prev + 1);
+      }, 50);
 
-      await axios.post("/game-results/save-summary", payload);
-
+      setStartMessage("✅ ጨዋታ ተጀመረ።");
     } catch (error) {
       const message = error?.response?.data?.message || error.message;
-      console.error("❌ Summary save failed:", message);
+      console.error("❌ Commission deduction or summary failed:", message);
       setStartMessage(`⛔ ውጤት ማስቀመጥ አልተቻለም። ${message}`);
     }
   } else if (isPaused) {
     setIsPaused(false);
   }
 };
+
 
 
 const restartGame = () => {
@@ -313,14 +354,9 @@ const restartGame = () => {
   setResult('');
   setInputCardId('');
   setIsPaused(false);
-
   if (typeof setCalledNumbers === 'function') setCalledNumbers([]);
-
-
   setIsGameRunning(true);
 };
-
-
   const cleanGame = () => {
   setIsGameRunning(false);
   setIsPaused(false);
@@ -331,8 +367,6 @@ const restartGame = () => {
   resetGameState();
   hasSavedSummary.current = false
 };
-
-
   const pauseGame = () => {
      playPauseSound(); 
     setIsPaused(true);
@@ -512,9 +546,7 @@ const verifyAndShowCard = () => {
     setStartMessage(`❌ ካርቴላ ${cardId} አላሸነፈም`);
     playFailSound();
   }
-
   setSelectedCard(card);
-
   const firstFour = calledNumbers.slice(0, 30);
 
   const checkFirstThirtyWin = () => {
@@ -539,7 +571,6 @@ const verifyAndShowCard = () => {
   setIsFirstFourWinner(checkFirstThirtyWin());
   setShowCardModal(true);
 };
-
   useEffect(() => {
     if (selectedCardIds.length > 0 && calledNumbers.length > 0) {
       const newWinners = [];
@@ -548,7 +579,6 @@ const verifyAndShowCard = () => {
 if (selectedCardIds.includes(card.id) && result?.isWinner) {
   newWinners.push(card.id);
 }
-
       });
       setWinningCards(newWinners);
     }
@@ -568,7 +598,6 @@ if (selectedCardIds.includes(card.id) && result?.isWinner) {
         ))}
       </div>
   </div>
-
   {/* 2. Winner Info */}
   <div className="winner-info">
     <button className="winner-button">
@@ -594,7 +623,6 @@ if (selectedCardIds.includes(card.id) && result?.isWinner) {
         {result && (
   <p className="signin-error">{result}</p>
 )}
-
       </div>
     </div>
   </div>
@@ -618,16 +646,11 @@ if (selectedCardIds.includes(card.id) && result?.isWinner) {
       </div>
     </div>
 </div>
-
-
-
 {startMessage && (
   <div className="signin-error">
     {startMessage}
   </div>
 )}
-
-
       <div className="game-board pop-style">
         <div className="bingo-letters">
           {['B', 'I', 'N', 'G', 'O'].map((letter) => (
@@ -646,10 +669,7 @@ if (selectedCardIds.includes(card.id) && result?.isWinner) {
                   key={colIndex}
                  className={`board-cell 
   ${calledNumbers?.includes?.(number) ? 'called pop' : ''} 
-  ${highlightedNumbers.includes(number) ? 'flashing' : ''}`}
-
-
-                >
+  ${highlightedNumbers.includes(number) ? 'flashing' : ''}`}>
                   {number}
                 </div>
               );
@@ -794,11 +814,8 @@ if (selectedCardIds.includes(card.id) && result?.isWinner) {
     🎯 ይህ ካርቴላ በመጀመሪያ 4 ጥሪ የ1000 ብር ቦነስ ተሸልመዋል!!
   </div>
 )}
-
-
   </div>
 </div>
-
       )}
     </div>
   );
@@ -816,7 +833,5 @@ BingoDashboard.propTypes = {
   cardCount: PropTypes.number.isRequired,
   onCommissionDeducted: PropTypes.func,
 };
-
-
 
 export default BingoDashboard;

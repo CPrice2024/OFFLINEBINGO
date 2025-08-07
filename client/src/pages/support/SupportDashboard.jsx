@@ -5,6 +5,12 @@ import Topbar from "../../components/TopBar";
 import Sidebar from "../../components/Sidebar";
 import BingoDashboard from "./BingoDashboard";
 import { AuthContext } from "../../context/AuthContext";
+import {
+  saveGameState,
+  loadGameState,
+  
+  
+} from "../../utils/indexedDB"; 
 import "../../styles/signStyle.css";
 
 const SupportDashboard = ({
@@ -31,45 +37,69 @@ const SupportDashboard = ({
 
   const navigate = useNavigate();
   const location = useLocation(); 
-  const userName = user?.name ;
+  const userName = user?.name;
 
+  // 🔐 Redirect if not support
   useEffect(() => {
-  if (userRole !== "support") {
-    navigate("/support/signin");
-  }
-}, [userRole, navigate]);
-
-
-useEffect(() => {
-    if (location?.state) {
-      const {
-        commissionPercent: fromStateCommission,
-        eachCardAmount: fromStateAmount,
-        cardCount: fromStateCount,
-      } = location.state;
-
-      if (fromStateCommission > 0) {
-        setCommissionPercent(fromStateCommission);
-      }
-
-      if (fromStateAmount > 0) {
-        setEachCardAmount(fromStateAmount);
-      }
-
-      if (fromStateCount > 0) {
-        setCardCount(fromStateCount);
-      }
+    if (userRole !== "support") {
+      navigate("/support/signin");
     }
-  }, [location?.state, setCommissionPercent, setEachCardAmount, setCardCount]);
+  }, [userRole, navigate]);
+
+  // 📦 Load game state (from route or IndexedDB)
+  useEffect(() => {
+    const loadGameStateFromRouteOrCache = async () => {
+      if (location?.state) {
+        const {
+          commissionPercent: fromStateCommission,
+          eachCardAmount: fromStateAmount,
+          cardCount: fromStateCount,
+        } = location.state;
+
+        if (fromStateCommission > 0) setCommissionPercent(fromStateCommission);
+        if (fromStateAmount > 0) setEachCardAmount(fromStateAmount);
+        if (fromStateCount > 0) setCardCount(fromStateCount);
+
+        await saveGameState({
+          commissionPercent: fromStateCommission,
+          eachCardAmount: fromStateAmount,
+          cardCount: fromStateCount
+        });
+      } else {
+        const cached = await loadGameState();
+        if (cached) {
+          setCommissionPercent(cached.commissionPercent || 0);
+          setEachCardAmount(cached.eachCardAmount || 0);
+          setCardCount(cached.cardCount || 0);
+        }
+      }
+    };
+
+    loadGameStateFromRouteOrCache();
+  }, [location?.state]);
+
+  // 🔁 Save game state changes to IndexedDB
+  useEffect(() => {
+    const saveCurrentState = async () => {
+      await saveGameState({
+        commissionPercent,
+        eachCardAmount,
+        cardCount,
+        calledNumbers,
+        selectedCardIds,
+        winnerAmount,
+      });
+    };
+    saveCurrentState();
+  }, [commissionPercent, eachCardAmount, cardCount, calledNumbers, selectedCardIds, winnerAmount]);
 
   const resetGameState = () => {
-  setCalledNumbers([]);
-  setWinnerAmount(0); // Reset winner amount
-  setWinningCardIds([]);
-  setEachCardAmount(0);
-  setCardCount(0);
-};
-
+    setCalledNumbers([]);
+    setWinnerAmount(0);
+    setWinningCardIds([]);
+    setEachCardAmount(0);
+    setCardCount(0);
+  };
 
   const handleGoToCardPage = () => {
     navigate("/bingocardpage", {
@@ -84,12 +114,14 @@ useEffect(() => {
       }
     });
   };
-    const handleLogout = async () => {
+
+  const handleLogout = async () => {
     try {
       await axios.post("/auth/logout", {}, { withCredentials: true });
-      navigate("/signin");
     } catch (err) {
-      console.error("Logout error:", err);
+      console.warn("Offline logout fallback triggered.");
+    } finally {
+      navigate("/support/signin");
     }
   };
 
@@ -98,11 +130,6 @@ useEffect(() => {
       topbarRef.current.fetchBalance();
     }
   };
-
-  // 🧪 Debug logs (optional)
-  console.log("commissionPercent:", commissionPercent);
-  console.log("eachCardAmount:", eachCardAmount);
-  console.log("cardCount:", cardCount);
 
   return (
     <div className="dashboard-layout">
@@ -128,31 +155,30 @@ useEffect(() => {
 
         <div className="p-4 max-w-xl mx-auto">
           <BingoDashboard
-  topbarRef={topbarRef}    
-  userRole={userRole}
-  userId={userId}
-  calledNumbers={calledNumbers}
-  setCalledNumbers={setCalledNumbers}
-  bingoCards={bingoCards}
-  setBingoCards={setBingoCards}
-  winnerAmount={winnerAmount}
-  setWinnerAmount={setWinnerAmount}
-  selectedCardIds={selectedCardIds}
-  setSelectedCardIds={setSelectedCardIds}
-  commissionPercent={commissionPercent}
-  setCommissionPercent={setCommissionPercent}
-  eachCardAmount={eachCardAmount}
-  setEachCardAmount={setEachCardAmount}
-  cardCount={cardCount}
-  setCardCount={setCardCount}
-  winningCardIds={winningCardIds}
-  setWinningCardIds={setWinningCardIds}
-  handleGoToCardPage={handleGoToCardPage}
-  user={user}
-  onCommissionDeducted={handleCommissionDeducted}
-  resetGameState={resetGameState}
-/>
-
+            topbarRef={topbarRef}
+            userRole={userRole}
+            userId={userId}
+            calledNumbers={calledNumbers}
+            setCalledNumbers={setCalledNumbers}
+            bingoCards={bingoCards}
+            setBingoCards={setBingoCards}
+            winnerAmount={winnerAmount}
+            setWinnerAmount={setWinnerAmount}
+            selectedCardIds={selectedCardIds}
+            setSelectedCardIds={setSelectedCardIds}
+            commissionPercent={commissionPercent}
+            setCommissionPercent={setCommissionPercent}
+            eachCardAmount={eachCardAmount}
+            setEachCardAmount={setEachCardAmount}
+            cardCount={cardCount}
+            setCardCount={setCardCount}
+            winningCardIds={winningCardIds}
+            setWinningCardIds={setWinningCardIds}
+            handleGoToCardPage={handleGoToCardPage}
+            user={user}
+            onCommissionDeducted={handleCommissionDeducted}
+            resetGameState={resetGameState}
+          />
         </div>
       </div>
     </div>

@@ -5,6 +5,7 @@ import React, {
   useContext,
   useCallback,
   forwardRef,
+
   useImperativeHandle,
 } from "react";
 import "../styles/topbarStyle.css";
@@ -21,6 +22,16 @@ import maximize from "../assets/maximize.png";
 import menuOpenIcon from "../assets/back.png";
 import menuCloseIcon from "../assets/shift.png";
 import { getPatternCells  } from "../../src/utils/patternUtils";
+import {
+  getOfflineBalance,
+  saveOfflineBalance,
+  saveCommission,
+  initDB,
+  getAllCommissions,
+  getAllGameSummaries,
+  saveGameSummary,
+} from '../../src/utils/indexedDB';
+
 
 const patternOptions = [
   "select winning pattern",
@@ -44,6 +55,7 @@ const patternOptions = [
 
 const Topbar = forwardRef(({ isCollapsed, sidebarOpen, setSidebarOpen }, ref) => {
   const [balance, setBalance] = useState(null);
+  const isOnline = navigator.onLine;
   const [notifications, setNotifications] = useState([]);
   const [sentTransactions, setSentTransactions] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -58,9 +70,12 @@ const Topbar = forwardRef(({ isCollapsed, sidebarOpen, setSidebarOpen }, ref) =>
 
   const notificationsRef = useRef();
   const profileRef = useRef();
-  const { userName, userRole, clearAuth } = useContext(AuthContext);
+  const { userName, userRole } = useContext(AuthContext);
   const navigate = useNavigate();
   const unreadCount = notifications.length;
+  const {
+    userId,
+  } = useContext(AuthContext);
 
   const [selectedPatterns, setSelectedPatterns] = useState(() => {
     const stored = localStorage.getItem("bingoSelectedPatterns");
@@ -74,48 +89,151 @@ const Topbar = forwardRef(({ isCollapsed, sidebarOpen, setSidebarOpen }, ref) =>
   useEffect(() => {
     localStorage.setItem("bingoUseAndLogic", JSON.stringify(useAndLogic));
   }, [useAndLogic]);
+  
 
-  const handleLogout = async () => {
-    setLoggingOut(true);
-    try {
-      await axios.post("/auth/logout", {}, { withCredentials: true });
-    } catch (err) {
-      console.error("Logout error:", err);
+const handleLogout = async () => {
+  setLoggingOut(false);
+  try {
+    await axios.post("/auth/logout", {}, { withCredentials: false });
+  } catch (err) {
+    console.warn("Offline logout fallback.");
+  }
+
+  navigate("/");
+};
+useEffect(() => {
+  const init = async () => {
+    await initDB();
+
+   if (navigator.onLine) {
+  console.log("🌐 Online: Fetching live data...");
+
+  const alreadyReset = localStorage.getItem("resetDone");
+
+  if (!alreadyReset) {
+    await fetchBalance(); // fetch and save
+    await fetchNotifications();
+    await syncOfflineDataToMongoDB();
+
+    // Schedule the reset
+    setTimeout(async () => {
+      try {
+        await axios.post("/support/reset-balance", { userId }, { withCredentials: true });
+        console.log("🧹 Online balance reset to 0 after 2 minutes.");
+        localStorage.setItem("resetDone", "true");
+      } catch (err) {
+        console.error("❌ Failed to reset online balance:", err.message);
+      }
+    }, 0 * 30 * 1000); 
+  } else {
+    console.log("⏩ Balance already reset previously — skipping.");
+    await fetchNotifications();
+    await syncOfflineDataToMongoDB();
+  }
+}
+
+ else {
+      console.warn("📴 Offline mode: Using cached data...");
+
+      try {
+const offlineBalance = await getOfflineBalance(userRole);
+if (typeof offlineBalance === "number" && !isNaN(offlineBalance)) {
+  console.warn("📦 Loaded balance from IndexedDB:", offlineBalance);
+  setBalance(offlineBalance);
+} else {
+  console.warn("⚠️ Offline balance is invalid:", offlineBalance);
+}
+      } catch (err) {
+        console.error("❌ Failed to get offline balance:", err);
+      }
+
+      try {
+
+      } catch (err) {
+        console.error("❌ Failed to get offline notifications:", err);
+      }
     }
-    clearAuth();
-    navigate("/");
   };
 
-  const fetchBalance = useCallback(async () => {
-    const endpoint =
-      userRole === "support"
-        ? "/auth/support/profile"
-        : userRole === "founder"
-        ? "/auth/founder/profile"
-        : null;
-    if (!endpoint) return;
+  init();
+}, [userId, userRole]);
 
-    try {
-      const res = await axios.get(endpoint, { withCredentials: true });
-      setBalance(res.data.balance ?? 0);
-    } catch (err) {
-      console.error("Failed to fetch balance:", err);
+
+
+
+const fetchBalance = useCallback(async () => {
+  const endpoint =
+    userRole === "support"
+      ? "/auth/support/profile"
+      : userRole === "founder"
+      ? "/auth/founder/profile"
+      : null;
+  if (!endpoint) return;
+
+  try {
+    const res = await axios.get(endpoint, { withCredentials: true });
+    const raw = res.data.balance;
+const balanceVal = typeof raw === "number" && !isNaN(raw) ? raw : 0;
+
+    setBalance(balanceVal);
+
+    // Save to IndexedDB
+    await saveOfflineBalance(userRole, balanceVal);
+  } catch (err) {
+    console.error("Failed to fetch balance:", err);
+
+    // Fallback to IndexedDB
+    const cachedBalance = await getOfflineBalance(userRole);
+    if (cachedBalance != null) {
+      setBalance(cachedBalance);
     }
-  }, [userRole]);
+  }
+}, [userRole]);
 
-  const fetchNotifications = useCallback(async () => {
-    let endpoint = null;
-    if (userRole === "support") endpoint = "/auth/support/notifications";
-    else if (userRole === "founder") endpoint = "/auth/founder/notifications";
-    if (!endpoint) return;
+const syncOfflineDataToMongoDB = async () => {
+  try {
+    const commissions = await getAllCommissions();
+    const summaries = await getAllGameSummaries();
 
-    try {
-      const res = await axios.get(endpoint, { withCredentials: true });
-      setNotifications(res.data || []);
-    } catch (err) {
-      console.error("Failed to fetch notifications:", err);
+    if (commissions.length > 0) {
+      await axios.post("/sync/commissions", { userId, commissions });
+     
     }
-  }, [userRole]);
+
+    if (summaries.length > 0) {
+      await axios.post("/sync/game-summaries", { userId, summaries });
+      
+    }
+
+    console.log("✅ Synced offline commissions and game summaries");
+  } catch (error) {
+    console.error("❌ Sync failed:", error.message);
+  }
+};
+
+const fetchNotifications = useCallback(async () => {
+  let endpoint = null;
+  if (userRole === "support") endpoint = "/auth/support/notifications";
+  else if (userRole === "founder") endpoint = "/auth/founder/notifications";
+  if (!endpoint) return;
+
+  try {
+    const res = await axios.get(endpoint, { withCredentials: true });
+    const data = res.data || [];
+    setNotifications(data);
+    console.log("✅ Fetched live notifications:", data);
+
+    
+  } catch (err) {
+    console.error("❌ Notification fetch failed. Falling back to IndexedDB:", err.message);
+
+    try {} catch (fallbackErr) {
+      console.error("❌ Failed to load notifications from IndexedDB:", fallbackErr.message);
+    }
+  }
+}, [userRole]);
+
+
 
   const fetchSentTransactions = useCallback(async () => {
     if (userRole !== "founder") return;
@@ -153,12 +271,132 @@ const Topbar = forwardRef(({ isCollapsed, sidebarOpen, setSidebarOpen }, ref) =>
     }
   };
 
-  useImperativeHandle(ref, () => ({
-    fetchBalance,
-    getBalance: () => balance,
-    getSelectedPatterns: () => selectedPatterns,
-    getUseAndLogic: () => useAndLogic,
-  }));
+useImperativeHandle(ref, () => ({
+applyCommission: async (amount, summaryPayload = null) => {
+  const newBalance = balance - amount;
+
+  if (newBalance < 0) {
+    console.error("❌ Not enough balance to deduct commission.");
+    return false;
+  }
+
+  try {
+    if (navigator.onLine) {
+     await axios.post("/support/sync-balance", { balance: newBalance }, { withCredentials: true });
+
+      if (summaryPayload) {
+        await axios.post("/game-results/save-summary", summaryPayload, { withCredentials: true });
+      }
+
+      setBalance(newBalance);
+    } else {
+      await saveCommission({ amount });
+      if (summaryPayload) {
+        await saveGameSummary(summaryPayload); // <-- you already use this in sync logic
+      }
+      setBalance(newBalance);
+    }
+
+    await saveOfflineBalance(userRole, newBalance);
+    localStorage.setItem('offlineBalance', newBalance.toString());
+    return true;
+  } catch (error) {
+    console.error("❌ Failed to apply commission:", error);
+    return false;
+  }
+},
+
+setBalance: async (value) => {
+  setBalance(value);
+  await saveOfflineBalance(userRole, value);
+  localStorage.setItem('offlineBalance', value.toString());
+},
+
+fetchBalance: async () => {
+  try {
+    const response = await axios.get('/auth/support/profile', { withCredentials: true });
+    const balance = response.data.balance;
+    await saveOfflineBalance("support", balance);
+  } catch (err) {
+    console.error('❌ Balance fetch failed:', err);
+  }
+},
+
+  getSelectedPatterns: () => Array.from(selectedPatterns),
+  getUseAndLogic: () => useAndLogic
+}));
+
+useEffect(() => {
+  const syncWhenOnline = async () => {
+    if (!navigator.onLine) return;
+
+    try {
+      // 1️⃣ Compare balance in IDB vs online
+      const [offlineBalance, res] = await Promise.all([
+        getOfflineBalance("support"),
+        axios.get("/auth/support/profile", { withCredentials: true }),
+      ]);
+
+      const onlineBalance = res.data.balance;
+
+      if (typeof offlineBalance === "number" && typeof onlineBalance === "number") {
+        if (offlineBalance !== onlineBalance) {
+          await axios.post(
+            "/support/sync-balance",
+            { balance: offlineBalance },
+            { withCredentials: true }
+          );
+          console.log("🔁 Synced mismatched balance:", offlineBalance);
+        } else {
+          console.log("✅ Local and server balance are in sync");
+        }
+      }
+
+      // 2️⃣ Sync commissions if needed
+      const pendingCommissions = await getAllCommissions();
+      const totalCommission = pendingCommissions.reduce((sum, c) => sum + Number(c.amount), 0);
+      if (totalCommission > 0) {
+        await axios.post(
+          "/support/update-balance",
+          { deducted: totalCommission },
+          { withCredentials: true }
+        );
+       
+        console.log(`✅ Synced and cleared ${pendingCommissions.length} commissions`);
+      }
+
+      // 3️⃣ Sync game summaries
+      const summaries = await getAllGameSummaries();
+      for (const summary of summaries) {
+        try {
+          await axios.post(
+            "/game-results/save-summary",
+            summary,
+            { withCredentials: true }
+          );
+        } catch (err) {
+          console.warn("⚠️ Summary sync failed for one:", err.message);
+        }
+      }
+
+      if (summaries.length > 0) {
+      
+        console.log(`✅ Synced ${summaries.length} summaries`);
+      }
+
+    } catch (err) {
+      console.error("❌ Full sync failed:", err.message || err);
+    }
+  };
+
+  window.addEventListener("online", syncWhenOnline);
+  syncWhenOnline(); 
+
+  return () => window.removeEventListener("online", syncWhenOnline);
+}, []);
+
+
+
 
   useEffect(() => {
     if (!userRole) return;
@@ -239,17 +477,20 @@ const Topbar = forwardRef(({ isCollapsed, sidebarOpen, setSidebarOpen }, ref) =>
           <button className="topbar-button" onClick={toggleFullscreen} title="Toggle Fullscreen">
             <img src={isFullscreen ? minimize : maximize} alt="Fullscreen" className="icon-img" />
           </button>
-
           {/* Balance */}
-          <div className="balance-container">
-            <button className="topbar-button balance-button">
-              <img src={balanceIcon} alt="Balance" className="icon-img" />
-              <div className="balance-tooltip">
-                ያልዎት ቀሪ ሂሳብ<br />
-                {balance !== null ? `${parseFloat(balance).toFixed(1)} ብር` : "በመጫን ላይ..."}
-              </div>
-            </button>
-          </div>
+ <div className="balance-container">
+  <button className="topbar-button balance-button">
+    <img src={balanceIcon} alt="Balance" className="icon-img" />
+    <div className="balance-tooltip">
+      ያልዎት ቀሪ ሂሳብ<br />
+      {typeof balance === "number" && !isNaN(balance)
+        ? `${balance.toFixed(1)} ብር`
+        : "በመጫን ላይ..."}
+    </div>
+  </button>
+</div>
+
+
 
           {/* Notifications */}
           {userRole === "support" && (

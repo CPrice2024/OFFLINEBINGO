@@ -384,8 +384,6 @@ useEffect(() => {
         </div>
       </div>
       
-      
-
       {showCreateSupport && (
         <div class="flag-overlay">
         <div className="create-support-modal">
