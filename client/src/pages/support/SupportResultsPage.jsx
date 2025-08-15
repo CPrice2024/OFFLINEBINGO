@@ -233,7 +233,7 @@ const handleNavigateToGame = () => {
         <div className="support-results-page">
           <div className="stats-cards">
             <div className="stat-cardd">
-              <img src={dailyIcon} alt="daily" />
+             
               <div>
                 <h4>Daily Commission</h4>
                 <p>{commissionStats.daily} ብር</p>
@@ -242,7 +242,7 @@ const handleNavigateToGame = () => {
               </div>
             </div>
             <div className="stat-cardd">
-              <img src={weeklyIcon} alt="weekly" />
+              
               <div>
                 <h4>Weekly Commission</h4>
                 <p>{commissionStats.weekly} ብር</p>
@@ -251,7 +251,7 @@ const handleNavigateToGame = () => {
               </div>
             </div>
             <div className="stat-cardd">
-              <img src={yearlyIcon} alt="yearly" />
+              
               <div>
                 <h4>Yearly Commission</h4>
                 <p>{commissionStats.yearly} ብር</p>
@@ -260,7 +260,7 @@ const handleNavigateToGame = () => {
               </div>
             </div>
             <div className="stat-cardd">
-              <img src={totalIcon} alt="total" />
+              
               <div>
                 <h4>Total Commission</h4>
                 <p>{commissionStats.total} ብር</p>
