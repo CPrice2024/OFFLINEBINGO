@@ -5,8 +5,8 @@ let dbPromise;
 
 export const initDB = async () => {
   if (!dbPromise) {
-    dbPromise = openDB('BingoGameDB', 1, {
-      upgrade(db) {
+    dbPromise = openDB('BingoGameDB', 2, { // Increment version number if adding new stores
+      upgrade(db, oldVersion) {
         if (!db.objectStoreNames.contains('offlineGameState')) {
           db.createObjectStore('offlineGameState', { keyPath: 'id' });
         }
@@ -24,6 +24,19 @@ export const initDB = async () => {
         }
         if (!db.objectStoreNames.contains('cachedSupport')) {
           db.createObjectStore('cachedSupport', { keyPath: 'email' });
+        }
+        // Add this for version 2
+        if (oldVersion < 2 && !db.objectStoreNames.contains('bingoImages')) {
+          db.createObjectStore('bingoImages', { keyPath: 'id' });
+        }
+        if (!db.objectStoreNames.contains('offlineSummaries')) {
+          db.createObjectStore('offlineSummaries', { autoIncrement: true });
+        }
+        if (!db.objectStoreNames.contains('supportCredentials')) {
+          db.createObjectStore('supportCredentials', { keyPath: 'email' });
+        }
+        if (!db.objectStoreNames.contains('bingoCards')) {
+          db.createObjectStore('bingoCards', { keyPath: 'id' });
         }
       },
     });
@@ -103,12 +116,12 @@ export const getSupportCredentials = async (email) => {
 //
 // 💰 Offline Balance
 //
+// 💰 Offline Balance (now backed by localStorage, not IndexedDB)
 export const saveOfflineBalance = async (id, balance) => {
   try {
-    const db = await getDB();
-    const tx = db.transaction('offlineBalance', 'readwrite');
-    await tx.objectStore('offlineBalance').put({ id, balance });
-    await tx.done;
+    localStorage.setItem("offlineBalance", String(balance));
+    // (Optional) if you want per-user:
+    // localStorage.setItem(`offlineBalance_${id}`, String(balance));
   } catch (error) {
     console.error("❌ Failed to save offline balance:", error);
   }
@@ -116,16 +129,16 @@ export const saveOfflineBalance = async (id, balance) => {
 
 export const getOfflineBalance = async (id) => {
   try {
-    const db = await getDB();
-    const tx = db.transaction('offlineBalance', 'readonly');
-    const result = await tx.objectStore('offlineBalance').get(id);
-    await tx.done;
-    return result?.balance ?? null;
+    const val = localStorage.getItem("offlineBalance");
+    // (Optional) per-user:
+    // const val = localStorage.getItem(`offlineBalance_${id}`);
+    return val !== null && !Number.isNaN(parseFloat(val)) ? parseFloat(val) : null;
   } catch (error) {
     console.error("❌ Failed to get offline balance:", error);
     return null;
   }
 };
+
 
 //
 // 🔔 Notifications (Offline Mode)
@@ -238,5 +251,31 @@ export const clearAllGameSummaries = async () => {
     await tx.done;
   } catch (error) {
     console.error("❌ Failed to clear game summaries:", error);
+  }
+// (Removed duplicate initDB declaration. Merge any upgrade/version logic into the original initDB above if needed.)
+};
+
+// Add these new functions for image handling
+export const saveBingoImage = async (id, blob) => {
+  try {
+    const db = await getDB();
+    const tx = db.transaction('bingoImages', 'readwrite');
+    await tx.objectStore('bingoImages').put({ id, blob });
+    await tx.done;
+  } catch (error) {
+    console.error("❌ Failed to save bingo image:", error);
+  }
+};
+
+export const getBingoImage = async (id) => {
+  try {
+    const db = await getDB();
+    const tx = db.transaction('bingoImages', 'readonly');
+    const result = await tx.objectStore('bingoImages').get(id);
+    await tx.done;
+    return result?.blob || null;
+  } catch (error) {
+    console.error("❌ Failed to get bingo image:", error);
+    return null;
   }
 };

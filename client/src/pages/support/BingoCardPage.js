@@ -114,6 +114,31 @@ useEffect(() => {
         cardCount: count,
       }
     });
+       
+  };
+const handleNavigateToSales = () => {
+    const cardAmount = parseFloat(winnerAmountInput);
+    const count = selectedCardIds.length;
+
+    const total = count * cardAmount;
+    const commission = (commissionPercent / 100) * total;
+    const finalAmount = total - commission;
+
+    setWinnerAmount(Math.round(finalAmount));
+    setEachCardAmount(cardAmount);
+    setCardCount(count);
+    setIsWinnerAmountSet(true);
+
+    navigate("/sales", {
+      state: {
+        calledNumbers,
+        winningCardIds,
+        commissionPercent,
+        eachCardAmount: cardAmount,
+        cardCount: count,
+      }
+    });
+       
   };
 
   useEffect(() => {
@@ -197,6 +222,8 @@ useEffect(() => {
           {/* Winner amount input */}
           <div className="winner-winner">
             <div className="input-group">
+              <button onClick={handleNavigateToSales} className="new_card_button">Check Sales
+              </button>
               <input
                 type="number"
                 value={winnerAmountInput}
@@ -229,6 +256,7 @@ useEffect(() => {
 
           {/* Actions */}
           <div className="action-buttons">
+
             <div className="find-card-input">
               <input
                 className="winner-amount-input"
@@ -242,13 +270,14 @@ useEffect(() => {
               <button onClick={handleFindCard} className="new_card_button">
                 <FaSearch style={{ marginRight: '8px' }} /> Search
               </button>
-            </div>
-            <button onClick={handleNewSelection} className="new_card_button">
+                          <button onClick={handleNewSelection} className="new_card_button">
               <FiRefreshCcw style={{ marginRight: '8px' }} /> Clear
             </button>
             <button onClick={handleNavigateToGame} className="new_card_button">
-              <FaGamepad style={{ marginRight: '8px' }} /> Save
+              <FaGamepad style={{ marginRight: '8px'  }} /> Save
             </button>
+            </div>
+
           </div>
 
           {foundCard && (

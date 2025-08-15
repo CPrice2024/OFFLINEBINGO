@@ -4,13 +4,15 @@ import Transaction from "../models/transactionModel.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { generateToken } from "../utils/generateToken.js";
+import { signBalance } from "../utils/signBalance.js";
 
 const cookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",
   sameSite: "none",
-  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  maxAge: 7 * 24 * 60 * 60 * 1000, 
 }; 
+const SECRET_KEY = process.env.BALANCE_SECRET;
 
 // ----------- Founder -----------
 export const signupFounder = async (req, res) => {
@@ -302,16 +304,21 @@ export const deleteSupport = async (req, res) => {
 export const getFounderProfile = async (req, res) => {
   try {
     const founder = await Founder.findById(req.user._id).select("-password");
-    if (!founder) return res.status(404).json({ message: "Founder not found" });
+    if (!founder) {
+      return res.status(404).json({ message: "Founder not found" });
+    }
+
+    const balance = founder.balance || 0;
+    const signature = signBalance(balance);
 
     res.json({
-      balance: founder.balance || 0,
+      balance,
+      signature,
       name: founder.name,
       email: founder.email,
     });
-  } catch (error) {
-    console.error("Fetch founder profile failed:", error);
-    return res.status(500).json({ message: "Internal server error" });
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -441,28 +448,22 @@ export const getFounderTransactions = async (req, res) => {
 // ----------- Support Profile -----------
 export const getSupportProfile = async (req, res) => {
   try {
-    console.log("🔑 Token payload (req.user):", req.user);
-
     const support = await Support.findById(req.user._id).select("-password");
     if (!support) {
-      console.error("❌ Support not found for ID:", req.user._id);
       return res.status(404).json({ message: "Support not found" });
     }
 
-    console.log("✅ Support profile fetched:", {
-      id: support._id,
-      email: support.email,
-      bingoCardType: support.bingoCardType,
-    });
+    const balance = support.balance || 0;
+    const signature = signBalance(balance);
 
     res.json({
-      balance: support.balance || 0,
+      balance,
+      signature, // send signature along with balance
       name: support.name,
       email: support.email,
       bingoCardType: support.bingoCardType || "default",
     });
   } catch (err) {
-    console.error("❌ getSupportProfile error:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -473,12 +474,20 @@ export const getSupportBalance = async (req, res) => {
     if (!support) {
       return res.status(404).json({ message: "Support user not found" });
     }
-    res.status(200).json({ balance: support.balance });
+
+    const balanceVal = support.balance || 0;
+    const signature = signBalance(balanceVal);
+
+    res.status(200).json({ 
+      balance: balanceVal,
+      balanceSignature: signature
+    });
   } catch (error) {
     console.error("getSupportBalance error:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
+
 
 
 export const syncOfflineCommissions = async (req, res) => {

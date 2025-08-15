@@ -9,8 +9,12 @@ import bingoBall3 from '../../assets/bingo-ball-3.png';
 import bingoBall4 from '../../assets/bingo-ball-4.png';
 import bingoBall5 from '../../assets/bingo-ball-5.png';
 import { getPatternCells } from '../../utils/patternUtils';
-import { db } from "../../utils/dexieDB";
-
+import { 
+  initDB,
+  saveBingoImage,
+  getBingoImage,
+  // ... other existing imports
+} from '../../utils/indexedDB';
 
 import {
   useCallSound,
@@ -20,6 +24,8 @@ import {
   useVerifySuccessSound,
   useVerifyFailSound
 } from '../../components/sounds';
+
+
 
 import '../../styles/BingoBoard.css';
 import { MdPlayArrow, MdRestartAlt, MdPause } from 'react-icons/md';
@@ -77,6 +83,7 @@ const BingoDashboard = ({
   const [checkingNumbers, setCheckingNumbers] = useState(false);
   const navigate = useNavigate();
   const [isFirstFourWinner, setIsFirstFourWinner] = useState(false);
+  const [currentBallImage, setCurrentBallImage] = useState(bingoBallDefault);
 
 const playCallSound = useCallSound();
 const playPauseSound = usePauseSound();
@@ -90,16 +97,63 @@ const playFailSound = useVerifyFailSound();
     { value: 1200, label: 'ፈጣን' },
     { value: 1000, label: 'በጣም ፈጣን' },
   ];
+useEffect(() => {
+  const initializeBingoImages = async () => {
+    try {
+      // Check if images are already stored
+      const defaultImage = await getBingoImage('default');
+      if (!defaultImage) {
+        // Convert imported images to blobs and store them
+        const images = [
+          { id: 'default', blob: await fetch(bingoBallDefault).then(r => r.blob()) },
+          { id: 'ball1', blob: await fetch(bingoBall1).then(r => r.blob()) },
+          { id: 'ball2', blob: await fetch(bingoBall2).then(r => r.blob()) },
+          { id: 'ball3', blob: await fetch(bingoBall3).then(r => r.blob()) },
+          { id: 'ball4', blob: await fetch(bingoBall4).then(r => r.blob()) },
+          { id: 'ball5', blob: await fetch(bingoBall5).then(r => r.blob()) }
+        ];
+        
+        for (const img of images) {
+          await saveBingoImage(img.id, img.blob);
+        }
+      }
+    } catch (error) {
+      console.error("Error initializing bingo images:", error);
+    }
+  };
+  
+  initializeBingoImages();
+}, []);
 
-  const getBingoBallImage = () => {
-  if (!isGameRunning || currentNumber === null) return bingoBallDefault;
-  if (currentNumber >= 1 && currentNumber <= 15) return bingoBall1;
-  if (currentNumber >= 16 && currentNumber <= 30) return bingoBall2;
-  if (currentNumber >= 31 && currentNumber <= 45) return bingoBall3;
-  if (currentNumber >= 46 && currentNumber <= 60) return bingoBall4;
-  if (currentNumber >= 61 && currentNumber <= 75) return bingoBall5;
-  return bingoBallDefault; 
+// Replace getBingoBallImage with this
+const updateBingoBallImage = async () => {
+  if (!isGameRunning || currentNumber === null) {
+    const blob = await getBingoImage('default');
+    setCurrentBallImage(blob ? URL.createObjectURL(blob) : bingoBallDefault);
+    return;
+  }
+
+  let imageId;
+  if (currentNumber >= 1 && currentNumber <= 15) imageId = 'ball1';
+  else if (currentNumber >= 16 && currentNumber <= 30) imageId = 'ball2';
+  else if (currentNumber >= 31 && currentNumber <= 45) imageId = 'ball3';
+  else if (currentNumber >= 46 && currentNumber <= 60) imageId = 'ball4';
+  else if (currentNumber >= 61 && currentNumber <= 75) imageId = 'ball5';
+  else imageId = 'default';
+
+  try {
+    const blob = await getBingoImage(imageId);
+    setCurrentBallImage(blob ? URL.createObjectURL(blob) : bingoBallDefault);
+  } catch (error) {
+    console.error("Error loading bingo image:", error);
+    setCurrentBallImage(bingoBallDefault);
+  }
 };
+
+// Add this effect to update image when number changes
+useEffect(() => {
+  updateBingoBallImage();
+}, [currentNumber]);
 
 const [highlighted, setHighlighted] = useState([]);
   const [patternIndex, setPatternIndex] = useState(0);
@@ -124,26 +178,28 @@ const [highlighted, setHighlighted] = useState([]);
   }, [patternIndex]);
 
 useEffect(() => {
-  const syncOfflineSummaries = async () => {
-    try {
-      const unsynced = await db.offlineSummaries
-        .where("isSynced")
-        .equals(false)
-        .toArray();
+const syncOfflineSummaries = async () => {
+  try {
+    const db = await initDB(); // Initialize the database first
+    const unsynced = await db.offlineSummaries
+      .where("isSynced")
+      .equals(false)
+      .toArray();
 
-      for (const summary of unsynced) {
-        try {
-          await axios.post("/game-results/save-summary", summary, { withCredentials: true });
-          await db.offlineSummaries.update(summary.id, { isSynced: true });
-          console.log("✅ Synced summary:", summary.id);
-        } catch (err) {
-          console.warn("❌ Failed to sync summary:", err.message);
-        }
+    for (const summary of unsynced) {
+      try {
+        await axios.post("/game-results/save-summary", summary, { withCredentials: true });
+        await db.offlineSummaries.update(summary.id, { isSynced: true });
+        console.log("✅ Synced summary:", summary.id);
+      } catch (err) {
+        console.warn("❌ Failed to sync summary:", err.message);
       }
-    } catch (err) {
-      console.error("❌ Error reading from Dexie:", err.message);
     }
-  };
+  } catch (err) {
+    console.error("❌ Error reading from Dexie:", err.message);
+  }
+};
+
 
   window.addEventListener("online", syncOfflineSummaries);
   return () => window.removeEventListener("online", syncOfflineSummaries);
@@ -631,7 +687,7 @@ if (selectedCardIds.includes(card.id) && result?.isWinner) {
  <div
       className={`bingo-ball-wrapper ${animateBall ? "" : ""}`}
       style={{
-        backgroundImage: `url(${getBingoBallImage()})`,
+        backgroundImage: `url(${currentBallImage})`,
         backgroundSize: "contain",
         backgroundRepeat: "no-repeat",
         backgroundPosition: "center center",

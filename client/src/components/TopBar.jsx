@@ -22,6 +22,7 @@ import maximize from "../assets/maximize.png";
 import menuOpenIcon from "../assets/back.png";
 import menuCloseIcon from "../assets/shift.png";
 import { getPatternCells  } from "../../src/utils/patternUtils";
+import crypto from "crypto-js";
 import {
   getOfflineBalance,
   saveOfflineBalance,
@@ -63,6 +64,7 @@ const Topbar = forwardRef(({ isCollapsed, sidebarOpen, setSidebarOpen }, ref) =>
   const [showProfile, setShowProfile] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
   const [showPatternDropdown, setShowPatternDropdown] = useState(false);
+  const SECRET_KEY = "client-shared-check-key"; 
   const [useAndLogic, setUseAndLogic] = useState(() => {
     const stored = localStorage.getItem("bingoUseAndLogic");
     return stored ? JSON.parse(stored) : false;
@@ -98,6 +100,7 @@ const handleLogout = async () => {
   } catch (err) {
     console.warn("Offline logout fallback.");
   }
+  localStorage.removeItem("bingoSelectedPatterns")
 
   navigate("/");
 };
@@ -111,7 +114,7 @@ useEffect(() => {
   const alreadyReset = localStorage.getItem("resetDone");
 
   if (!alreadyReset) {
-    await fetchBalance(); // fetch and save
+    await fetchBalance(); 
     await fetchNotifications();
     await syncOfflineDataToMongoDB();
 
@@ -136,19 +139,27 @@ useEffect(() => {
       console.warn("📴 Offline mode: Using cached data...");
 
       try {
-const offlineBalance = await getOfflineBalance(userRole);
-if (typeof offlineBalance === "number" && !isNaN(offlineBalance)) {
-  console.warn("📦 Loaded balance from IndexedDB:", offlineBalance);
+const stored = localStorage.getItem("offlineBalance");
+if (stored !== null && !Number.isNaN(parseFloat(stored))) {
+  const offlineBalance = parseFloat(stored);
+  console.warn("📦 Loaded balance from localStorage:", offlineBalance);
   setBalance(offlineBalance);
 } else {
-  console.warn("⚠️ Offline balance is invalid:", offlineBalance);
+  console.warn("⚠️ No valid offlineBalance in localStorage");
 }
       } catch (err) {
         console.error("❌ Failed to get offline balance:", err);
       }
 
       try {
-
+        const stored = localStorage.getItem("offlineNotifications");
+        if (stored !== null) {
+          const offlineNotifications = JSON.parse(stored);
+          console.warn("📦 Loaded notifications from localStorage:", offlineNotifications);
+          setNotifications(offlineNotifications);
+        } else {
+          console.warn("⚠️ No valid offlineNotifications in localStorage");
+        }
       } catch (err) {
         console.error("❌ Failed to get offline notifications:", err);
       }
@@ -157,8 +168,6 @@ if (typeof offlineBalance === "number" && !isNaN(offlineBalance)) {
 
   init();
 }, [userId, userRole]);
-
-
 
 
 const fetchBalance = useCallback(async () => {
@@ -173,20 +182,26 @@ const fetchBalance = useCallback(async () => {
   try {
     const res = await axios.get(endpoint, { withCredentials: true });
     const raw = res.data.balance;
-const balanceVal = typeof raw === "number" && !isNaN(raw) ? raw : 0;
+    const signature = res.data.signature;
 
+    // Verify signature
+    const expectedSig = crypto
+      .HmacSHA256(raw.toString(), SECRET_KEY)
+      .toString(crypto.enc.Hex);
+
+    if (signature !== expectedSig) {
+      console.error("Balance signature verification failed!");
+      return; // Don't trust this balance
+    }
+
+    const balanceVal = typeof raw === "number" && !isNaN(raw) ? raw : 0;
     setBalance(balanceVal);
 
     // Save to IndexedDB
     await saveOfflineBalance(userRole, balanceVal);
   } catch (err) {
     console.error("Failed to fetch balance:", err);
-
     // Fallback to IndexedDB
-    const cachedBalance = await getOfflineBalance(userRole);
-    if (cachedBalance != null) {
-      setBalance(cachedBalance);
-    }
   }
 }, [userRole]);
 
@@ -327,6 +342,20 @@ fetchBalance: async () => {
 }));
 
 useEffect(() => {
+  const handleOffline = () => {
+    console.log("📴 Switched to offline — showing local balance");
+    const stored = localStorage.getItem("offlineBalance");
+    if (stored !== null && !Number.isNaN(parseFloat(stored))) {
+      setBalance(parseFloat(stored));
+    }
+  };
+
+  window.addEventListener("offline", handleOffline);
+  return () => window.removeEventListener("offline", handleOffline);
+}, []);
+
+
+useEffect(() => {
   const syncWhenOnline = async () => {
     if (!navigator.onLine) return;
 
@@ -401,15 +430,8 @@ useEffect(() => {
   useEffect(() => {
     if (!userRole) return;
 
-    fetchBalance();
     fetchNotifications();
     fetchSentTransactions();
-
-    const interval = setInterval(() => {
-      fetchBalance();
-      fetchNotifications();
-      fetchSentTransactions();
-    }, 10000);
 
     const handleClickOutside = (e) => {
       if (notificationsRef.current && !notificationsRef.current.contains(e.target)) {
@@ -429,10 +451,10 @@ useEffect(() => {
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      clearInterval(interval);
+      clearInterval();
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [userRole, fetchBalance, fetchNotifications, fetchSentTransactions]);
+  }, [userRole, fetchNotifications, fetchSentTransactions]);
 
   return (
     <>
@@ -450,7 +472,6 @@ useEffect(() => {
             />
           </button>
         </div>
-
         <div className="topbar-right">
           {/* Profile */}
           <div className="dropdown-container" ref={profileRef}>

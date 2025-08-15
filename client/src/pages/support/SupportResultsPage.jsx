@@ -84,7 +84,12 @@ useEffect(() => {
   fetchResults();
 }, []);
 
+const handleNavigateToGame = () => {
 
+
+    navigate("/Agent/dashboard");
+       
+  };
   const computeStats = (data) => {
     const now = new Date();
 
@@ -285,24 +290,28 @@ useEffect(() => {
               setFiltered(results);
               computeStats(results);
             }}>Clear</button>
+            <button onClick={handleNavigateToGame}>
+              Bingo Game
+            </button>
           </div>
 
           <div className="navigation-buttons">
             <button onClick={exportToPDF}>
               <FaFilePdf /> Export to PDF
             </button>
+
           </div>
 
           <table className="results-table">
             <thead>
               <tr>
-                <th><FaIdCard /> No</th>
-                <th><FaTrophy /> Game ID</th>
-                <th><FaPercent /> Commission</th>
-                <th><FaUsers /> Players</th>
-                <th><FaMoneyBill /> sales</th>
-                <th><FaMoneyBill /> Total Amount</th>
-                <th><FaClock /> Time</th>
+                <th>No</th>
+                <th> Game ID</th>
+                <th>Commission</th>
+                <th>Players</th>
+                <th>Sales</th>
+                <th>Total Amount</th>
+                <th>Time</th>
               </tr>
             </thead>
             <tbody>

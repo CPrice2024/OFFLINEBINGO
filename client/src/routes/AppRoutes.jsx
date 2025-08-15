@@ -44,8 +44,8 @@ const AppRoutes = () => {
       
 
       {/* Founder Routes */}
-      <Route path="/main/signin" element={<FounderSignin />} />
-      
+      <Route path="/main" element={<FounderSignin />} />
+
       <Route
         path="/main/Users"
         element={
