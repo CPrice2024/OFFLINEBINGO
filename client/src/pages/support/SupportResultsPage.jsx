@@ -260,7 +260,6 @@ const handleNavigateToGame = () => {
               </div>
             </div>
             <div className="stat-cardd">
-              
               <div>
                 <h4>Total Commission</h4>
                 <p>{commissionStats.total} ብር</p>
